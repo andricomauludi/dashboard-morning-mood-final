@@ -1,9 +1,59 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import bsCustomFileInput from "bs-custom-file-input";
 
 export class CreateInventory extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      formData: {
+        product_name: "",
+        price: "",
+        description: "",
+        menu_type: "",
+        photo: "",
+      },
+      selectedOption: "",
+      response: null,
+    };
+  }
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Selected option:", this.state.selectedOption);
+    try {
+      const response = await fetch("http://127.0.0.1:8090/api/product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(this.state.formData),
+      });
+
+      const jsonData = await response.json();
+      this.setState({ response: jsonData });
+    } catch (error) {
+      console.log("Error submitting form:", error);
+    }
+  };
+
+  handleOptionChange = (e) => {
+    this.setState({ selectedOption: e.target.value });
+  };
+
+  handleInputChange = (e) => {
+    const { name, value } = e.target;
+    this.setState((prevState) => ({
+      formData: {
+        ...prevState.formData,
+        [name]: value,
+        price: parseInt(value),
+        menu_type: this.state.selectedOption,
+      },
+    }));
+  };
+
   state = {
     startDate: new Date(),
   };
@@ -19,6 +69,8 @@ export class CreateInventory extends Component {
   }
 
   render() {
+    const { formData, response } = this.state;
+
     return (
       <div>
         <div className="page-header">
@@ -39,15 +91,20 @@ export class CreateInventory extends Component {
             <div className="card">
               <div className="card-body">
                 <h4 className="card-title">Basic form elements</h4>
+                {/* Render the API response */}
+                {response && <div>{typeof formData.price}</div>}
                 <p className="card-description"> Basic form elements </p>
-                <form className="forms-sample">
+                <form onSubmit={this.handleSubmit} className="forms-sample">
                   <Form.Group>
                     <label htmlFor="product_name">Product Name</label>
                     <Form.Control
                       type="text"
                       className="form-control"
                       id="product_name"
-                      placeholder="Product_name"
+                      name="product_name"
+                      value={formData.product_name}
+                      onChange={this.handleInputChange}
+                      placeholder="Insert Product Name"
                     />
                   </Form.Group>
                   <Form.Group>
@@ -55,58 +112,68 @@ export class CreateInventory extends Component {
                     <textarea
                       className="form-control"
                       id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={this.handleInputChange}
                       rows="4"
+                      placeholder="Insert Description"
                     ></textarea>
                   </Form.Group>
-                 
+
                   <Form.Group className="row">
-                        <label className="col-sm-2 col-form-label">
-                          Menu Type
+                    <label className="col-sm-2 col-form-label">Menu Type</label>
+                    <div className="col-sm-3">
+                      <div className="form-check form-check-warning">
+                        <label className="form-check-label">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            name="menu_type"
+                            id="Coffee"
+                            value="Coffee"
+                            checked={this.state.selectedOption === "Coffee"}
+                            onChange={this.handleOptionChange}
+                          />{" "}
+                          Coffee
+                          <i className="input-helper"></i>
                         </label>
-                        <div className="col-sm-3">
-                          <div className="form-check form-check-warning">
-                            <label className="form-check-label">
-                              <input
-                                type="radio"
-                                className="form-check-input"
-                                name="ExampleRadio4"
-                                id="membershipRadios1"
-                                defaultChecked
-                              />{" "}
-                              Coffee
-                              <i className="input-helper"></i>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-sm-3">
-                          <div className="form-check form-check-warning">
-                            <label className="form-check-label">
-                              <input
-                                type="radio"
-                                className="form-check-input"
-                                name="ExampleRadio4"
-                                id="membershipRadios2"
-                              />{" "}
-                              Rice
-                              <i className="input-helper"></i>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-sm-3">
-                          <div className="form-check form-check-warning">
-                            <label className="form-check-label">
-                              <input
-                                type="radio"
-                                className="form-check-input"
-                                name="ExampleRadio4"
-                                id="membershipRadios2"
-                              />{" "}
-                              Sandwich
-                              <i className="input-helper"></i>
-                            </label>
-                          </div>
-                        </div>
-                      </Form.Group>
+                      </div>
+                    </div>
+                    <div className="col-sm-3">
+                      <div className="form-check form-check-warning">
+                        <label className="form-check-label">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            name="menu_type"
+                            id="Rice"
+                            value="Rice"
+                            checked={this.state.selectedOption === "Rice"}
+                            onChange={this.handleOptionChange}
+                          />{" "}
+                          Rice
+                          <i className="input-helper"></i>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-sm-3">
+                      <div className="form-check form-check-warning">
+                        <label className="form-check-label">
+                          <input
+                            type="radio"
+                            className="form-check-input"
+                            name="menu_type"
+                            id="Sandwich"
+                            value="sandwich"
+                            checked={this.state.selectedOption === "sandwich"}
+                            onChange={this.handleOptionChange}
+                          />{" "}
+                          sandwich
+                          <i className="input-helper"></i>
+                        </label>
+                      </div>
+                    </div>
+                  </Form.Group>
                   <Form.Group>
                     <label>Photo</label>
                     <div className="custom-file">
@@ -130,10 +197,15 @@ export class CreateInventory extends Component {
                         </span>
                       </div>
                       <Form.Control
-                        type="text"
+                        type="number"
+                        pattern="[0-9]*"
                         className="form-control"
                         aria-label="Amount (to the nearest dollar)"
                         id="price"
+                        name="price"
+                        value={parseInt(formData.price)}
+                        placeholder="Insert Price"
+                        onChange={this.handleInputChange}
                       />
                     </div>
                   </Form.Group>
