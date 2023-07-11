@@ -1,35 +1,55 @@
 import React, { Component, useEffect, useState } from "react";
-import { ProgressBar } from "react-bootstrap";
+import { ProgressBar, Row } from "react-bootstrap";
 
-const [datsa, setData] = useState(null);
+export const Inventory = () => {
+  const [datsa, setData] = useState(null);
+  const tableData = [
+    { id: 1, name: "John", age: 25 },
+    { id: 2, name: "Jane", age: 30 },
+    { id: 3, name: "Bob", age: 35 },
+  ];
+  const columns = Object.keys(tableData[0]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8090/api/product");
+        const datsa = await response.json();
 
-const tableData = [
-  { id: 1, name: "John", age: 25 },
-  { id: 2, name: "Jane", age: 30 },
-  { id: 3, name: "Bob", age: 35 },
-];
-const columns = Object.keys(tableData[0]);
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8090/api/product");
-      const datsa = await response.json();
+        setData(datsa);
+      } catch (error) {
+        return <div>Error {error} </div>;
+      }
+    };
+    fetchData();
+    return;
+    // dispatch(getSandwichLists());
+  }, [datsa]);
 
-      setData(datsa);
-    } catch (error) {
-      return <div>Error {error} </div>;
-    }
-  };
-  console.log(datsa);
-  fetchData();
-  return;
-  // dispatch(getSandwichLists());
-}, [datsa]);
-const datas = datsa.data
-
-export class Inventory extends Component {
-  render() {
+  if (!datsa) {
     return (
+      <>
+        <div>
+          <h1>Loading ...</h1>
+        </div>
+      </>
+    );
+  }
+
+  const datas = datsa.data;
+  function getButtonColor(data) {
+    if (data === 'rice') {
+      return 'badge badge-outline-primary';
+    } else if (data === 'sandwich') {
+      return 'badge badge-outline-success';
+    } if (data === 'coffee') {
+      return 'badge badge-outline-warning';
+    }else{
+      return 'badge badge-outline-info';
+    }
+  }
+
+  return (
+    <>
       <div>
         <div className="page-header">
           <h3 className="page-title"> Inventory </h3>
@@ -45,16 +65,23 @@ export class Inventory extends Component {
           </nav>
         </div>
         <div className="row">
-          <div className="col-lg-6 grid-margin stretch-card">
+          <div className="col-lg-12 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
-                <h4 className="card-title">Products</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-hover</code>
-                </p>
+                <Row>
+                  <div className="col-lg-6 grid-margin stretch-card">
+                    <h4 className="card-title">Products</h4>
+                  </div>
+                  <div className="col-lg-6 mr-auto text-sm-right ">
+                    <a href="/inventory/create" className="align-items-right">
+                      <button className="btn btn-outline-warning">
+                        <span><i className="mdi mdi-plus"></i></span>Create Product
+                      </button>
+                    </a>
+                  </div>
+                </Row>
                 <div className="table-responsive">
-                  <table className="table table-hover">
+                  <table className="table table-dark table-hover">
                     <thead>
                       <tr>
                         <th>Product Name</th>
@@ -62,14 +89,35 @@ export class Inventory extends Component {
                         <th>Description</th>
                         <th>Menu type</th>
                         <th>Photo</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {tableData.map((row) => (
-                        <tr key={row.id}>
-                          {columns.map((column) => (
-                            <td key={column}>{row[column]}</td>
-                          ))}
+                      {datas.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.product_name}</td>
+                          <td>Rp. {row.price} ,-</td>
+                          <td>{row.description}</td>
+                          <td><div className={getButtonColor(row.menu_type)}>{row.menu_type}</div></td>
+                          <td>{row.photo}</td>
+                          <td>
+                            <div className="row">
+                              <div className="col-md-6">
+                                <a href="/dashboard">
+                                  <button className="btn btn-outline-danger">
+                                    <i className="mdi mdi-delete-forever"></i>
+                                  </button>
+                                </a>
+                              </div>
+                              <div className="col-md-6">
+                                <a href="/dashboard">
+                                  <button className="btn btn-outline-info">
+                                    <i className="mdi mdi-table-edit"></i>
+                                  </button>
+                                </a>
+                              </div>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -78,7 +126,7 @@ export class Inventory extends Component {
               </div>
             </div>
           </div>
-          <div className="col-lg-6 grid-margin stretch-card">
+          <div className="col-lg-12 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
                 <h4 className="card-title">Transactions</h4>
@@ -594,8 +642,7 @@ export class Inventory extends Component {
           </div>
         </div>
       </div>
-    );
-  }
-}
-
+    </>
+  );
+};
 export default Inventory;
