@@ -16,12 +16,24 @@ export class CreateInventory extends Component {
       },
       selectedOption: "",
       response: null,
+      selectedImage: null,
     };
   }
 
+  handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    this.setState((prevState) => ({
+      formData: {
+        ...prevState.formData,
+        photo:file.name
+        
+      },
+    }));
+    this.setState({ selectedImage: file });
+  };
+
   handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Selected option:", this.state.selectedOption);
     try {
       const response = await fetch("http://127.0.0.1:8090/api/product", {
         method: "POST",
@@ -40,6 +52,13 @@ export class CreateInventory extends Component {
 
   handleOptionChange = (e) => {
     this.setState({ selectedOption: e.target.value });
+    this.setState((prevState) => ({
+      formData: {
+        ...prevState.formData,
+        menu_type:this.state.selectedOption
+        
+      },
+    }));
   };
 
   handleInputChange = (e) => {
@@ -50,6 +69,7 @@ export class CreateInventory extends Component {
         [name]: value,
         price: parseInt(value),
         menu_type: this.state.selectedOption,
+        
       },
     }));
   };
@@ -90,10 +110,10 @@ export class CreateInventory extends Component {
           <div className="col-12 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
-                <h4 className="card-title">Basic form elements</h4>
+                <h4 className="card-title">Adding product</h4>
                 {/* Render the API response */}
-                {response && <div>{typeof formData.price}</div>}
-                <p className="card-description"> Basic form elements </p>
+                
+                <p className="card-description"> adding product to database </p>
                 <form onSubmit={this.handleSubmit} className="forms-sample">
                   <Form.Group>
                     <label htmlFor="product_name">Product Name</label>
@@ -181,6 +201,7 @@ export class CreateInventory extends Component {
                         type="file"
                         className="form-control visibility-hidden"
                         id="photo"
+                        onChange={this.handleImageUpload}
                         lang="es"
                       />
                       <label className="custom-file-label" htmlFor="photo">

@@ -9,9 +9,9 @@ export class Login extends Component {
         <div className="d-flex align-items-center auth px-0">
           <div className="row w-100 mx-0">
             <div className="col-lg-4 mx-auto">
-              <div className="card text-left py-5 px-4 px-sm-5">
+              <div className="card text-center py-5 px-4 px-sm-5">
                 <div className="brand-logo">
-                  <img src={require("../../assets/images/logo.svg")} alt="logo" />
+                  <img src={require("../../assets/images/logo-morning-mood.png")} alt="logo" />
                 </div>
                 <h4>Hello! let's get started</h4>
                 <h6 className="font-weight-light">Sign in to continue.</h6>
