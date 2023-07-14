@@ -22,6 +22,7 @@ export class CreateInventory extends Component {
 
   handleImageUpload = (event) => {
     const file = event.target.files[0];
+    console.log(file)
     this.setState((prevState) => ({
       formData: {
         ...prevState.formData,
