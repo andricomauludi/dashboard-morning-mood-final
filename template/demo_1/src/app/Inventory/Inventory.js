@@ -1,14 +1,46 @@
 import React, { Component, useEffect, useState } from "react";
-import { ProgressBar, Row } from "react-bootstrap";
+import { Modal, ProgressBar, Row } from "react-bootstrap";
+import axios from 'axios';
+import Button from "react-bootstrap/Button";
 
 export const Inventory = () => {
+  const [show, setShow] = useState(false);
+  const [rowid, setRowid] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8090/api/product', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: parseInt(rowid)}), // Replace with your JSON data
+      });
+  
+      if (response.ok) {
+        console.log('Item deleted successfully');
+        // Perform any additional actions upon successful deletion
+      } else {
+        console.error('Error deleting item:', response.status);
+        // Handle the error appropriately
+      }
+
+      // Update the state or perform any other necessary actions
+    } catch (error) {
+      // Handle error
+      console.error('Error deleting item:', error);
+    }
+  };
+
+
+  const handleClose = () => setShow(false);
+  const handleShow = (e) => {
+    setShow(true)
+    setRowid(e.target.value)
+    console.log(rowid)
+    
+  };
   const [datsa, setData] = useState(null);
-  const tableData = [
-    { id: 1, name: "John", age: 25 },
-    { id: 2, name: "Jane", age: 30 },
-    { id: 3, name: "Bob", age: 35 },
-  ];
-  const columns = Object.keys(tableData[0]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,7 +55,7 @@ export const Inventory = () => {
     fetchData();
     return;
     // dispatch(getSandwichLists());
-  }, [datsa]);
+  }, []);
 
   if (!datsa) {
     return (
@@ -37,14 +69,15 @@ export const Inventory = () => {
 
   const datas = datsa.data;
   function getButtonColor(data) {
-    if (data === 'rice') {
-      return 'badge badge-outline-primary';
-    } else if (data === 'sandwich') {
-      return 'badge badge-outline-success';
-    } if (data === 'coffee') {
-      return 'badge badge-outline-warning';
-    }else{
-      return 'badge badge-outline-info';
+    if (data === "rice") {
+      return "badge badge-outline-primary";
+    } else if (data === "sandwich") {
+      return "badge badge-outline-success";
+    }
+    if (data === "coffee") {
+      return "badge badge-outline-warning";
+    } else {
+      return "badge badge-outline-info";
     }
   }
 
@@ -75,7 +108,10 @@ export const Inventory = () => {
                   <div className="col-lg-6 mr-auto text-sm-right ">
                     <a href="/inventory/create" className="align-items-right">
                       <button className="btn btn-outline-warning">
-                        <span><i className="mdi mdi-plus"></i></span>Create Product
+                        <span>
+                          <i className="mdi mdi-plus"></i>
+                        </span>
+                        Create Product
                       </button>
                     </a>
                   </div>
@@ -98,19 +134,27 @@ export const Inventory = () => {
                           <td>{row.product_name}</td>
                           <td>Rp. {row.price} ,-</td>
                           <td>{row.description}</td>
-                          <td><div className={getButtonColor(row.menu_type)}>{row.menu_type}</div></td>
+                          <td>
+                            <div className={getButtonColor(row.menu_type)}>
+                              {row.menu_type}
+                            </div>
+                          </td>
                           <td>{row.photo}</td>
                           <td>
                             <div className="row">
                               <div className="col-md-6">
-                                <a href="/dashboard">
-                                  <button className="btn btn-outline-danger">
+                                <a>
+                                  <button
+                                    className="btn btn-outline-danger"
+                                    value={row.id}
+                                    onClick={handleShow}
+                                  >
                                     <i className="mdi mdi-delete-forever"></i>
                                   </button>
                                 </a>
                               </div>
                               <div className="col-md-6">
-                                <a href="/dashboard">
+                                <a>
                                   <button className="btn btn-outline-info">
                                     <i className="mdi mdi-table-edit"></i>
                                   </button>
@@ -642,6 +686,30 @@ export const Inventory = () => {
           </div>
         </div>
       </div>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        {/* <Modal.Header closeButton>
+          <Modal.Title>Modal title</Modal.Title>
+        </Modal.Header> */}
+        <Modal.Body>
+          
+            <div className="text-center">
+              <i sty className="icon-lg text-danger mdi mdi-comment-question-outline"></i>
+            </div>
+            <div className="text-center">Are you sure want to delete ?</div>
+         
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

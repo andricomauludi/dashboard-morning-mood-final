@@ -89,7 +89,7 @@ export class Dashboard extends Component {
                       alt="banner"
                     />
                   </div>
-                  <div className="col-5 col-sm-7 col-xl-8 p-0">
+                  <div className="col-8 col-sm-7" style={{marginLeft:"30px"}}>
                     <h4 className="mb-1 mb-sm-0">Lets Get Started, Contribute your Morning Mood !</h4>
                     <p className="mb-0 font-weight-normal d-none d-sm-block">
                       We are thrilled wth your passion

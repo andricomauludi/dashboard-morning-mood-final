@@ -2,6 +2,7 @@ import React, { Component, useState } from "react";
 import { Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import bsCustomFileInput from "bs-custom-file-input";
+import ModalConfirmation from "../shared/ModalConfirmation";
 
 export class CreateInventory extends Component {
   constructor(props) {
@@ -112,6 +113,7 @@ export class CreateInventory extends Component {
             <div className="card">
               <div className="card-body">
                 <h4 className="card-title">Adding product</h4>
+              
                 {/* Render the API response */}
                 
                 <p className="card-description"> adding product to database </p>
