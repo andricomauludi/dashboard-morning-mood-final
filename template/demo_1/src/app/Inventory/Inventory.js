@@ -1,44 +1,44 @@
 import React, { Component, useEffect, useState } from "react";
 import { Modal, ProgressBar, Row } from "react-bootstrap";
-import axios from 'axios';
+import axios from "axios";
 import Button from "react-bootstrap/Button";
+import { Loading } from "react-loading-wrapper";
+import "react-loading-wrapper/dist/index.css";
 
 export const Inventory = () => {
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleDelete = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8090/api/product', {
-        method: 'DELETE',
+      const response = await fetch("http://127.0.0.1:8090/api/product", {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: parseInt(rowid)}), // Replace with your JSON data
+        body: JSON.stringify({ id: parseInt(rowid) }), // Replace with your JSON data
       });
-  
+
       if (response.ok) {
-        console.log('Item deleted successfully');
+        console.log("Item deleted successfully");
         // Perform any additional actions upon successful deletion
       } else {
-        console.error('Error deleting item:', response.status);
+        console.error("Error deleting item:", response.status);
         // Handle the error appropriately
       }
 
       // Update the state or perform any other necessary actions
     } catch (error) {
       // Handle error
-      console.error('Error deleting item:', error);
+      console.error("Error deleting item:", error);
     }
   };
 
-
   const handleClose = () => setShow(false);
   const handleShow = (e) => {
-    setShow(true)
-    setRowid(e.target.value)
-    console.log(rowid)
-    
+    setShow(true);
+    setRowid(e.currentTarget.value);
   };
   const [datsa, setData] = useState(null);
   useEffect(() => {
@@ -83,6 +83,7 @@ export const Inventory = () => {
 
   return (
     <>
+     
       <div>
         <div className="page-header">
           <h3 className="page-title"> Inventory </h3>
@@ -120,6 +121,7 @@ export const Inventory = () => {
                   <table className="table table-dark table-hover">
                     <thead>
                       <tr>
+                        <th>id</th>
                         <th>Product Name</th>
                         <th>Price</th>
                         <th>Description</th>
@@ -131,6 +133,7 @@ export const Inventory = () => {
                     <tbody>
                       {datas.map((row, index) => (
                         <tr key={index}>
+                          <td>{row.id}</td>
                           <td>{row.product_name}</td>
                           <td>Rp. {row.price} ,-</td>
                           <td>{row.description}</td>
@@ -696,15 +699,31 @@ export const Inventory = () => {
           <Modal.Title>Modal title</Modal.Title>
         </Modal.Header> */}
         <Modal.Body>
-          
+        <Loading
+            loading={loading}
+            // Optional props
+            color="orange"
+            backgroundColor="blue"
+            fullPage
+            size={100}
+            speed="fast"
+            // Use your own component, or the 'threeDots' component for the loading screen (default is spinner).
+            loadingComponent="threeDots"
+          >
+            </Loading>
+
             <div className="text-center">
-              <i sty className="icon-lg text-danger mdi mdi-comment-question-outline"></i>
+              <i
+                sty
+                className="icon-lg text-danger mdi mdi-comment-question-outline"
+              ></i>
             </div>
             <div className="text-center">Are you sure want to delete ?</div>
-         
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
