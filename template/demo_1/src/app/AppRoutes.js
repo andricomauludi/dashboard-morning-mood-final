@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import Spinner from '../app/shared/Spinner';
 import Inventory from './Inventory/Inventory';
 import CreateInventory from './Inventory/CreateInventory';
+import PointOfSales from './point-of-sales/PointOfSales';
 
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 
@@ -34,6 +35,8 @@ class AppRoutes extends Component {
           <Route exact path="/dashboard" component={ Dashboard } />
           <Route path="/inventory/show" component={ Inventory } />
           <Route path="/inventory/create" component={ CreateInventory } />
+
+          <Route path="/pos" component={ PointOfSales } />
 
           <Route path="/basic-ui/buttons" component={ Buttons } />
           <Route path="/basic-ui/dropdowns" component={ Dropdowns } />
