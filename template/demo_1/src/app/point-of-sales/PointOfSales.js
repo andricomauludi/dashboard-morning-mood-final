@@ -1,10 +1,8 @@
 import React, { Component, useEffect, useState } from "react";
-import { Image, Modal, ProgressBar, Row } from "react-bootstrap";
+import { Form, Image, Modal, ProgressBar, Row } from "react-bootstrap";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
-import { Loading } from "react-loading-wrapper";
 import "react-loading-wrapper/dist/index.css";
-import { Doughnut } from "react-chartjs-2";
 import Slider from "react-slick";
 
 export const PointOfSales = () => {
@@ -73,9 +71,7 @@ export const PointOfSales = () => {
     );
   };
   const handleDelete2 = (id) => {
-    setSelectedImages((prevState) =>
-      prevState.filter((img) => img.id !== id)
-    );
+    setSelectedImages((prevState) => prevState.filter((img) => img.id !== id));
   };
 
   const getTotalCount = () => {
@@ -87,6 +83,12 @@ export const PointOfSales = () => {
       (total, image) => total + image.count * image.harga,
       0
     );
+  };
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    }).format(price);
   };
 
   useEffect(() => {
@@ -329,7 +331,6 @@ export const PointOfSales = () => {
                                 </div>
                                 <div className="row justify-content-center">
                                   <h4>{row.harga}</h4>
-                                  
                                 </div>
                               </div>
                             </>
@@ -358,24 +359,35 @@ export const PointOfSales = () => {
                           >
                             <div className="text-md-center text-xl-left">
                               <h6 className="mb-1">{image.nama_menu}</h6>
-                              <p className="text-muted mb-0">
-                                Rp.{image.harga},- x{" "}
-                                <input
-                                  type="number"
-                                  value={image.count}
-                                  min="0"
-                                  onChange={(e) =>
-                                    handleCountChange(image.id, e.target.value)
-                                  }
-                                  style={{ width: "50px" }}
-                                />
-                              </p>
+                              <div className="form-inline">
+                                <p className="text-muted mb-0">
+                                  {formatPrice(image.harga)} x{" "}
+                                  <input
+                                    type="number"
+                                    value={image.count}
+                                    min="0"
+                                    className="form-control"
+                                    onChange={(e) =>
+                                      handleCountChange(
+                                        image.id,
+                                        e.target.value
+                                      )
+                                    }
+                                    style={{ width: "60px" }}
+                                  />
+                                </p>
+                              </div>
                             </div>
                             <div className="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                              <h6 className="font-weight-bold mb-0">
-                                Rp.{image.harga * image.count},-{" "}
+                              <h6 className="font-weight-bold mb-2">
+                                {formatPrice(image.harga * image.count)}{" "}
                               </h6>
-                              <button onClick={() => handleDelete2(image.id)}>Delete</button>
+                              <button
+                                className="btn btn-rounded btn-inverse-danger"
+                                onClick={() => handleDelete2(image.id)}
+                              >
+                                Delete
+                              </button>
                             </div>
                           </div>
                         </>
@@ -386,7 +398,20 @@ export const PointOfSales = () => {
                     // <p>No images selected yet.</p>
                   )}
                   {/* <h3>Total Count: {getTotalCount()}</h3> */}
-                  <h3>Total Pembayaran: Rp.{getTotalPrice()},-</h3>
+                  <div className="row mt-3">
+                    <div className="col-lg-6 text-xl-left">
+                      <h6>Total Pembayaran:</h6>
+                    </div>
+                    <div className="col-lg-6 text-xl-right">
+                      <h6>{formatPrice(getTotalPrice())}</h6>
+                    </div>
+                  </div>
+                  <button
+                    className="mt-3 btn btn-inverse-info btn-lg btn-block"
+                    onClick={handleShow}
+                  >
+                    Bayar
+                  </button>
                 </div>
               </div>
             </div>
@@ -403,34 +428,40 @@ export const PointOfSales = () => {
           <Modal.Title>Modal title</Modal.Title>
         </Modal.Header> */}
         <Modal.Body>
-          <Loading
-            loading={loading}
-            // Optional props
-            color="orange"
-            backgroundColor="blue"
-            fullPage
-            size={100}
-            speed="fast"
-            // Use your own component, or the 'threeDots' component for the loading screen (default is spinner).
-            loadingComponent="threeDots"
-          ></Loading>
-
-          <div className="text-center">
-            <i
-              sty
-              className="icon-lg text-danger mdi mdi-comment-question-outline"
-            ></i>
-          </div>
-          <div className="text-center">Are you sure want to delete ?</div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={handleDelete}>
-            Delete
-          </Button>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
+        <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">Pembayaran</h4>
+                <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p>
+                <form className="forms-sample">
+                  <Form.Group>
+                    <label htmlFor="exampleInputUsername1">Username</label>
+                    <Form.Control type="text" id="exampleInputUsername1" placeholder="Username" />
+                  </Form.Group>
+                  <Form.Group>
+                    <label htmlFor="exampleInputEmail1">Email address</label>
+                    <Form.Control type="email" className="form-control" id="exampleInputEmail1" placeholder="Email" />
+                  </Form.Group>
+                  <Form.Group>
+                    <label htmlFor="exampleInputPassword1">Password</label>
+                    <Form.Control type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" />
+                  </Form.Group>
+                  <Form.Group>
+                    <label htmlFor="exampleInputConfirmPassword1">Confirm Password</label>
+                    <Form.Control type="password" className="form-control" id="exampleInputConfirmPassword1" placeholder="Password" />
+                  </Form.Group>
+                  <div className="form-check">
+                    <label className="form-check-label text-muted">
+                      <input type="checkbox" className="form-check-input"/>
+                      <i className="input-helper"></i>
+                      Remember me
+                    </label>
+                  </div>
+                  <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                  <button className="btn btn-dark">Cancel</button>
+                </form>
+              </div>
+            </div>          
+        </Modal.Body>       
       </Modal>
     </>
   );
