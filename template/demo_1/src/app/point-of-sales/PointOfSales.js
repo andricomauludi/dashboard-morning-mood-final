@@ -50,6 +50,12 @@ export const PointOfSales = () => {
   const [dataMinuman, setDataMinuman] = useState(null);
   const [dataCemilan, setDataCemilan] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
+  const [cashPaid, setCashPaid] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState("");
+
+  const handlePaymentChange = (event) => {
+    setSelectedPayment(event.target.value);
+  };
 
   const handleImageClick = (image) => {
     setSelectedImages((prevState) => {
@@ -78,19 +84,50 @@ export const PointOfSales = () => {
     return selectedImages.reduce((total, image) => total + image.count, 0);
   };
 
+  // PERUANGAN DUNIAWI
+  const formatCash = (value) => {
+    const num = value.replace(/\D/g, '');
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
+  const handleCashChange = (event) => {
+    setCashPaid(formatCash(event.target.value));
+  };
+  
   const getTotalPrice = () => {
     return selectedImages.reduce(
       (total, image) => total + image.count * image.harga,
       0
     );
   };
+
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
     }).format(price);
   };
+  const totalAmount = getTotalPrice();
 
+  const parseCash = (value) => {
+    return parseFloat(value.replace(/\./g, ''));
+  };
+
+  const calculateChange = () => {
+    const cash = parseCash(cashPaid);
+    return cash && cash > totalAmount ? cash - totalAmount : 0;
+  };
+
+  const isCashEnough = () => {
+    const cash = parseCash(cashPaid);
+    return cash && cash >= totalAmount;
+  };
+
+  const changeTextClass = () => {
+    return calculateChange() > 0 ? 'text-success' : 'text-danger';
+  };
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -200,12 +237,12 @@ export const PointOfSales = () => {
     <>
       <div>
         <div className="page-header">
-          <h3 className="page-title"> Inventory </h3>
+          <h3 className="page-title"> Point of Sales </h3>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
                 <a href="!#" onClick={(event) => event.preventDefault()}>
-                  Inventory
+                  Point of Sales
                 </a>
               </li>
               {/* <li className="breadcrumb-item active" aria-current="page">Basic tables</li> */}
@@ -428,40 +465,90 @@ export const PointOfSales = () => {
           <Modal.Title>Modal title</Modal.Title>
         </Modal.Header> */}
         <Modal.Body>
-        <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Pembayaran</h4>
-                <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p>
-                <form className="forms-sample">
-                  <Form.Group>
-                    <label htmlFor="exampleInputUsername1">Username</label>
-                    <Form.Control type="text" id="exampleInputUsername1" placeholder="Username" />
-                  </Form.Group>
-                  <Form.Group>
-                    <label htmlFor="exampleInputEmail1">Email address</label>
-                    <Form.Control type="email" className="form-control" id="exampleInputEmail1" placeholder="Email" />
-                  </Form.Group>
-                  <Form.Group>
-                    <label htmlFor="exampleInputPassword1">Password</label>
-                    <Form.Control type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" />
-                  </Form.Group>
-                  <Form.Group>
-                    <label htmlFor="exampleInputConfirmPassword1">Confirm Password</label>
-                    <Form.Control type="password" className="form-control" id="exampleInputConfirmPassword1" placeholder="Password" />
-                  </Form.Group>
-                  <div className="form-check">
-                    <label className="form-check-label text-muted">
-                      <input type="checkbox" className="form-check-input"/>
-                      <i className="input-helper"></i>
-                      Remember me
-                    </label>
-                  </div>
-                  <button type="submit" className="btn btn-primary mr-2">Submit</button>
-                  <button className="btn btn-dark">Cancel</button>
-                </form>
-              </div>
-            </div>          
-        </Modal.Body>       
+          <div className="card">
+            <div className="card-body">
+              <h4 className="card-title">Pembayaran</h4>
+              <p>Order No : Order#109</p>
+              <p>Klien : Guest</p>
+              {/* <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p> */}
+              <h3 className="text-warning"> Total Pembayaran {formatPrice(getTotalPrice())} </h3>
+              <form className="forms-sample">
+                <Form.Group>
+                  <label className="mt-2" htmlFor="exampleFormControlSelect2">
+                    Jenis Pembayaran
+                  </label>
+                  <select
+                    className="form-control text-white"
+                    id="exampleFormControlSelect2"
+                    value={selectedPayment}
+                    onChange={handlePaymentChange}
+                  >
+                    {!selectedPayment && (
+                      <option value="">
+                        Silahkan klik untuk memilih jenis pembayaran
+                      </option>
+                    )}
+                    <option value="Cash">Cash</option>
+                    <option value="Transfer Mandiri">Transfer Mandiri</option>
+                    <option value="Transfer BCA">Transfer BCA</option>
+                    <option value="QRIS">QRIS</option>
+                  </select>
+                </Form.Group>
+
+                {selectedPayment && (
+                <>
+                  {selectedPayment === 'Cash' && (
+                    <Form.Group>
+                      <label htmlFor="cashInfo">Uang yang Dibayar</label>
+                      <Form.Control
+                        type="text"
+                        id="cashInfo"
+                        className="text-white"
+                        placeholder="Berapa uang cash yang diterima"
+                        value={cashPaid}
+                        onChange={handleCashChange}
+                      />
+                      {cashPaid && (
+                        <h3 className={isCashEnough() ? changeTextClass() : 'text-danger'}>
+                          {isCashEnough()
+                            ? `Kembalian: ${formatPrice(calculateChange())}`
+                            : 'Uang yang diberikan tidak cukup'}
+                        </h3>
+                      )}
+                    </Form.Group>
+                  )}
+                   {selectedPayment === 'Transfer Mandiri' && (
+                    <Form.Group>
+                      <p>Silahkan transfer ke nomor rekening di bawah ini</p>
+                      <label>Nomor Rekening Mandiri</label>
+                      <h3 className="text-success">1330-0109-5082-2</h3> 
+                      {/* ini masih rekening mandiri */}
+                    </Form.Group>
+                  )}
+                   {selectedPayment === 'Transfer BCA' && (
+                    <Form.Group>
+                      <p>Silahkan transfer ke nomor rekening di bawah ini</p>
+                      <label>Nomor Rekening BCA</label>
+                      <h3 className="text-success">8410-0875-89</h3>
+                    </Form.Group>
+                  )}
+                </>
+              )}
+                              
+                <button type="submit" className="btn btn-inverse-info btn-lg btn-block mr-5">
+                  Bayar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="btn btn-inverse-danger btn-lg btn-block mr-5"
+                >
+                  Cancel
+                </button>
+              </form>
+            </div>
+          </div>
+        </Modal.Body>
       </Modal>
     </>
   );
