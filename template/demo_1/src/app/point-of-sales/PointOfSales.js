@@ -51,10 +51,12 @@ export const PointOfSales = () => {
   const [dataCemilan, setDataCemilan] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [cashPaid, setCashPaid] = useState('');
+  const [cashPaidDisplay, setCashPaidDisplay] = useState('');
   const [selectedPayment, setSelectedPayment] = useState("");
 
   const handlePaymentChange = (event) => {
     setSelectedPayment(event.target.value);
+    setCashPaid("");
   };
 
   const handleImageClick = (image) => {
@@ -62,17 +64,17 @@ export const PointOfSales = () => {
       const existingImage = prevState.find((img) => img.id === image.id);
       if (existingImage) {
         return prevState.map((img) =>
-          img.id === image.id ? { ...img, count: img.count + 1 } : img
+          img.id === image.id ? { ...img, jumlah: img.jumlah + 1, } : img
         );
       }
-      return [...prevState, { ...image, count: 1 }];
+      return [...prevState, { ...image, jumlah: 1, id_menu:image.id }];
     });
   };
 
   const handleCountChange = (id, newCount) => {
     setSelectedImages((prevState) =>
       prevState.map((img) =>
-        img.id === id ? { ...img, count: parseInt(newCount) || 0 } : img
+        img.id === id ? { ...img, jumlah: parseInt(newCount) || 0 } : img
       )
     );
   };
@@ -81,22 +83,62 @@ export const PointOfSales = () => {
   };
 
   const getTotalCount = () => {
-    return selectedImages.reduce((total, image) => total + image.count, 0);
+    return selectedImages.reduce((total, image) => total + image.jumlah, 0);
   };
 
   // PERUANGAN DUNIAWI
   const formatCash = (value) => {
-    const num = value.replace(/\D/g, '');
-    return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const num = value.replace(/\D/g, ''); // Remove non-numeric characters
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Add dots for every three digits
   };
 
   const handleCashChange = (event) => {
-    setCashPaid(formatCash(event.target.value));
+    const value = event.target.value;
+    // Remove non-numeric characters
+    const numericValue = value.replace(/\D/g, '');
+  
+    setCashPaid(numericValue); // Set cashPaid as a number without dots
+  
+    // Format the numeric value for display
+    const formattedValue = formatCash(numericValue);
+    setCashPaidDisplay(formattedValue);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+  
+    formData.append("nama_bill", "#Order#109");
+    formData.append("id_klien", 1);
+    formData.append("nama_klien", "guest");
+    formData.append("total", getTotalPrice());
+    formData.append("jenis_pembayaran", selectedPayment);
+    formData.append("cash_in", cashPaid);
+    formData.append("cash_out", calculateChange());
+    const modifiedSelectedImages = selectedImages.map(({ id, ...rest }) => rest);
+  
+  
+    try {
+      // API call for bill
+      await axios.post("http://127.0.0.1:8090/api/transaction/create_bill", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      // API call for detail_bill
+      await axios.post("http://127.0.0.1:8090/api/transaction/create_detail_bill_json", modifiedSelectedImages);
+  
+      // Close the modal after successful submission
+      handleClose();
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
   
   const getTotalPrice = () => {
     return selectedImages.reduce(
-      (total, image) => total + image.count * image.harga,
+      (total, image) => total + image.jumlah * image.harga,
       0
     );
   };
@@ -125,18 +167,18 @@ export const PointOfSales = () => {
   };
 
   const changeTextClass = () => {
-    return calculateChange() > 0 ? 'text-success' : 'text-danger';
+    const cash = parseCash(cashPaid);
+    return cash && cash >= totalAmount ? 'text-success' : 'text-danger';
   };
   
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        console.log("masuk");
+        
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/makanan"
-        ); //ngambil api dari auth me
-        console.log(data);
+        ); //ngambil api dari auth me        
         setDataMakanan(data);
         setLoading(false);
       } catch (e) {
@@ -149,11 +191,10 @@ export const PointOfSales = () => {
     const fetchData2 = async () => {
       setLoading(true);
       try {
-        console.log("masuk");
+        
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/minuman"
-        ); //ngambil api dari auth me
-        console.log(data);
+        ); //ngambil api dari auth me        
         setDataMinuman(data);
         setLoading(false);
       } catch (e) {
@@ -165,12 +206,10 @@ export const PointOfSales = () => {
     };
     const fetchData3 = async () => {
       setLoading(true);
-      try {
-        console.log("masuk");
+      try {        
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/cemilan"
-        ); //ngambil api dari auth me
-        console.log(data);
+        ); //ngambil api dari auth me        
         setDataCemilan(data);
         setLoading(false);
       } catch (e) {
@@ -220,18 +259,6 @@ export const PointOfSales = () => {
   const datas = dataMakanan.data;
   const datas2 = dataMinuman.data;
   const datas3 = dataCemilan.data;
-  function getButtonColor(data) {
-    if (data === "rice") {
-      return "badge badge-outline-primary";
-    } else if (data === "sandwich") {
-      return "badge badge-outline-success";
-    }
-    if (data === "coffee") {
-      return "badge badge-outline-warning";
-    } else {
-      return "badge badge-outline-info";
-    }
-  }
 
   return (
     <>
@@ -401,7 +428,7 @@ export const PointOfSales = () => {
                                   {formatPrice(image.harga)} x{" "}
                                   <input
                                     type="number"
-                                    value={image.count}
+                                    value={image.jumlah}
                                     min="0"
                                     className="form-control"
                                     onChange={(e) =>
@@ -417,7 +444,7 @@ export const PointOfSales = () => {
                             </div>
                             <div className="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
                               <h6 className="font-weight-bold mb-2">
-                                {formatPrice(image.harga * image.count)}{" "}
+                                {formatPrice(image.harga * image.jumlah)}{" "}
                               </h6>
                               <button
                                 className="btn btn-rounded btn-inverse-danger"
@@ -469,10 +496,10 @@ export const PointOfSales = () => {
             <div className="card-body">
               <h4 className="card-title">Pembayaran</h4>
               <p>Order No : Order#109</p>
-              <p>Klien : Guest</p>
+              <p>Klien : Guest</p>              
               {/* <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p> */}
               <h3 className="text-warning"> Total Pembayaran {formatPrice(getTotalPrice())} </h3>
-              <form className="forms-sample">
+              <form onSubmit={handleSubmit} className="forms-sample">
                 <Form.Group>
                   <label className="mt-2" htmlFor="exampleFormControlSelect2">
                     Jenis Pembayaran
@@ -505,15 +532,16 @@ export const PointOfSales = () => {
                         id="cashInfo"
                         className="text-white"
                         placeholder="Berapa uang cash yang diterima"
-                        value={cashPaid}
+                        value={cashPaidDisplay}
                         onChange={handleCashChange}
                       />
                       {cashPaid && (
-                        <h3 className={isCashEnough() ? changeTextClass() : 'text-danger'}>
+                        <h3 className={changeTextClass()}>
                           {isCashEnough()
                             ? `Kembalian: ${formatPrice(calculateChange())}`
                             : 'Uang yang diberikan tidak cukup'}
                         </h3>
+                        
                       )}
                     </Form.Group>
                   )}
@@ -521,7 +549,7 @@ export const PointOfSales = () => {
                     <Form.Group>
                       <p>Silahkan transfer ke nomor rekening di bawah ini</p>
                       <label>Nomor Rekening Mandiri</label>
-                      <h3 className="text-success">1330-0109-5082-2</h3> 
+                      <h3 className="text-success">1330-0109-5082-2</h3>                      
                       {/* ini masih rekening mandiri */}
                     </Form.Group>
                   )}
