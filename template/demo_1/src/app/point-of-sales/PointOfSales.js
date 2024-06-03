@@ -15,6 +15,8 @@ export const PointOfSales = () => {
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [doneModal, setDoneModal] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -42,6 +44,7 @@ export const PointOfSales = () => {
   };
 
   const handleClose = () => setShow(false);
+  const handleClose2 = () => setDoneModal(false);
   const handleShow = (e) => {
     setShow(true);
     setRowid(e.currentTarget.value);
@@ -49,14 +52,25 @@ export const PointOfSales = () => {
   const [dataMakanan, setDataMakanan] = useState(null);
   const [dataMinuman, setDataMinuman] = useState(null);
   const [dataCemilan, setDataCemilan] = useState(null);
+  const [dataReceiptBill, setDataReceiptBill] = useState(null);
+  const [dataReceiptDetailBill, setDataReceiptDetailBill] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [cashPaid, setCashPaid] = useState('');
-  const [cashPaidDisplay, setCashPaidDisplay] = useState('');
+  const [cashPaid, setCashPaid] = useState("");
+  const [cashPaidDisplay, setCashPaidDisplay] = useState("");
   const [selectedPayment, setSelectedPayment] = useState("");
 
   const handlePaymentChange = (event) => {
-    setSelectedPayment(event.target.value);
-    setCashPaid("");
+    const paymentType = event.target.value;
+    setSelectedPayment(paymentType);
+
+    if (paymentType === "Cash") {
+      setCashPaid("");
+      setCashPaidDisplay("");
+    } else {
+      const totalAmount = getTotalPrice();
+      setCashPaid(totalAmount.toString());
+      setCashPaidDisplay(formatCash(totalAmount.toString()));
+    }
   };
 
   const handleImageClick = (image) => {
@@ -64,10 +78,23 @@ export const PointOfSales = () => {
       const existingImage = prevState.find((img) => img.id === image.id);
       if (existingImage) {
         return prevState.map((img) =>
-          img.id === image.id ? { ...img, jumlah: img.jumlah + 1, } : img
+          img.id === image.id
+            ? {
+                ...img,
+                jumlah: img.jumlah + 1,
+                total_harga: (img.jumlah + 1) * img.harga, // Calculate total_harga
+              }
+            : img
         );
       }
-      return [...prevState, { ...image, jumlah: 1, id_menu:image.id }];
+      return [
+        ...prevState,
+        {
+          ...image,
+          jumlah: 1,
+          total_harga: image.harga, // Initialize total_harga with harga for new image
+        },
+      ];
     });
   };
 
@@ -86,19 +113,34 @@ export const PointOfSales = () => {
     return selectedImages.reduce((total, image) => total + image.jumlah, 0);
   };
 
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZone: "Asia/Jakarta", // Set timezone to Indonesia
+    };
+    return date.toLocaleString("id-ID", options); // Convert timestamp to Indonesian date time string
+  };
+
   // PERUANGAN DUNIAWI
   const formatCash = (value) => {
-    const num = value.replace(/\D/g, ''); // Remove non-numeric characters
-    return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Add dots for every three digits
+    const num = value.replace(/\D/g, ""); // Remove non-numeric characters
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Add dots for every three digits
   };
 
   const handleCashChange = (event) => {
     const value = event.target.value;
     // Remove non-numeric characters
-    const numericValue = value.replace(/\D/g, '');
-  
+    const numericValue = value.replace(/\D/g, "");
+
     setCashPaid(numericValue); // Set cashPaid as a number without dots
-  
+
     // Format the numeric value for display
     const formattedValue = formatCash(numericValue);
     setCashPaidDisplay(formattedValue);
@@ -107,7 +149,8 @@ export const PointOfSales = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
-  
+    setLoadingModal(true); // Show loading modal
+
     formData.append("nama_bill", "#Order#109");
     formData.append("id_klien", 1);
     formData.append("nama_klien", "guest");
@@ -115,34 +158,65 @@ export const PointOfSales = () => {
     formData.append("jenis_pembayaran", selectedPayment);
     formData.append("cash_in", cashPaid);
     formData.append("cash_out", calculateChange());
-    const modifiedSelectedImages = selectedImages.map(({ id, ...rest }) => rest);
-  
-  
+    formData.append("paid", 1);
+
+    const modifiedSelectedImages = selectedImages.map(
+      ({ id, ...rest }) => rest
+    );
+
     try {
       // API call for bill
-      await axios.post("http://127.0.0.1:8090/api/transaction/create_bill", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-  
+      const billResponse = await axios.post(
+        "http://127.0.0.1:8090/api/transaction/create_bill",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const billId = billResponse.data.data.id;
+      setDataReceiptBill(billResponse.data.data);
+      console.log(billId);
+      // Include other necessary data for detail_bill here
+      const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
+        ...image,
+        id_bill: billId,
+      }));
+
       // API call for detail_bill
-      await axios.post("http://127.0.0.1:8090/api/transaction/create_detail_bill_json", modifiedSelectedImages);
-  
-      // Close the modal after successful submission
+      const detailBillResponse = await axios.post(
+        "http://127.0.0.1:8090/api/transaction/create_detail_bill_json",
+        modifiedSelectedImages2
+      );
+
+      console.log("Detail bill response:", detailBillResponse.data.data);
+      setDataReceiptDetailBill(detailBillResponse.data.data);
+      // const detailBillResponse = await axios.post("http://127.0.0.1:8090/api/transaction/create_detail_bill_json", {
+      //  modifiedSelectedImages
+      // });
+
+      // Clear selectedImages and selectedPayment after sending data
+      setSelectedImages([]);
+      setSelectedPayment("");
+
+      // Close the modal after successful submission s
       handleClose();
+      setDoneModal(true);
     } catch (error) {
       console.error("Error submitting data:", error);
+    } finally {
+      setLoadingModal(false); // Hide loading modal
     }
   };
-  
+
   const getTotalPrice = () => {
     return selectedImages.reduce(
       (total, image) => total + image.jumlah * image.harga,
       0
     );
   };
-
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -153,7 +227,7 @@ export const PointOfSales = () => {
   const totalAmount = getTotalPrice();
 
   const parseCash = (value) => {
-    return parseFloat(value.replace(/\./g, ''));
+    return parseFloat(value.replace(/\./g, ""));
   };
 
   const calculateChange = () => {
@@ -168,17 +242,16 @@ export const PointOfSales = () => {
 
   const changeTextClass = () => {
     const cash = parseCash(cashPaid);
-    return cash && cash >= totalAmount ? 'text-success' : 'text-danger';
+    return cash && cash >= totalAmount ? "text-success" : "text-danger";
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/makanan"
-        ); //ngambil api dari auth me        
+        ); //ngambil api dari auth me
         setDataMakanan(data);
         setLoading(false);
       } catch (e) {
@@ -191,10 +264,9 @@ export const PointOfSales = () => {
     const fetchData2 = async () => {
       setLoading(true);
       try {
-        
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/minuman"
-        ); //ngambil api dari auth me        
+        ); //ngambil api dari auth me
         setDataMinuman(data);
         setLoading(false);
       } catch (e) {
@@ -206,10 +278,10 @@ export const PointOfSales = () => {
     };
     const fetchData3 = async () => {
       setLoading(true);
-      try {        
+      try {
         const { data } = await axios.get(
           "http://127.0.0.1:8090/api/product/cemilan"
-        ); //ngambil api dari auth me        
+        ); //ngambil api dari auth me
         setDataCemilan(data);
         setLoading(false);
       } catch (e) {
@@ -225,6 +297,175 @@ export const PointOfSales = () => {
     return;
     // dispatch(getSandwichLists());
   }, []);
+
+  const printReceipt = () => {
+    const printContent = generateReceiptContent();
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const generateReceiptContent = () => {
+    const receiptContent = `
+    <style>
+        body * {
+            visibility: hidden;
+        }
+
+        #receipt-modal,
+        #receipt-modal * {
+            visibility: visible;
+        }
+
+        #receipt-modal {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            width: 58mm;
+            /* Adjust the width as needed */
+            margin: 0 auto;
+        }
+
+        #receipt-modal h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #receipt-modal hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        #receipt-modal .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px;
+            margin:0px;
+        }
+
+        #receipt-modal .col-6 {
+            flex: 0 0 50%;
+        }
+
+        #receipt-modal p {
+            margin: 5px 0;
+            font-size: 10px;
+        }
+
+        #receipt-modal .text-center {
+            text-align: center;
+        }
+
+        #receipt-modal .text-left {
+            text-align: left;
+            
+        }
+
+        #receipt-modal .text-right {
+            text-align: right;
+            
+        }
+
+        #receipt-modal .text-dark {
+            color: #000 !important;
+        }
+
+        #receipt-modal .bg-white {
+            background-color: #fff !important;
+        }
+
+        #receipt-modal .text-success {
+            color: #28a745 !important;
+        }
+
+        #receipt-modal .text-danger {
+            color: #dc3545 !important;
+        }
+    </style>
+  
+      <div id="receipt-modal">
+        <h2 class="text-center">Kedai Ceu Monny</h2>
+        <h5 class="text-center">Villa Bogor Indah 6, Blok B6 No.10. Sukaraja, Kabupaten Bogor</h5>
+        <h5 class="text-center">+62 821-1249-2060</h5>
+        <p>Order#${dataReceiptBill.id}</p>
+        <hr style="margin-bottom:20px;" />
+        ${
+          dataReceiptDetailBill
+            ? dataReceiptDetailBill
+                .map(
+                  (item) => `
+                    <div class="row" style="padding:0px; margin-top:-30px; margin-bottom:-20px">
+                      <div class="col-6">
+                        <div class="row">
+                          <h6 class="text-left ml-4">${item.jumlah}</h6>
+                          <h6 class="text-left ml-4">${item.nama_menu}</h6>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <h6 class="text-right mr-4">${formatPrice(
+                          item.total_harga
+                        )}</h6>
+                      </div>
+                    </div>
+                  `
+                )
+                .join("")
+            : "<p>Loading detail items...</p>"
+        }
+        <hr />
+        <div class="row">
+          <div class="col-6">
+            <h6 class="text-right mr-4">Total Amount:</h6>
+          </div>
+          <div class="col-6">
+            <h6 class="text-right mr-4">${formatPrice(
+              dataReceiptBill.total
+            )}</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <p class="text-right mr-4">Jenis Pembayaran:</p>
+          </div>
+          <div class="col-6">
+            <p class="text-right mr-4">${
+              dataReceiptBill.jenis_pembayaran
+            }</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <p class="text-right mr-4">Uang Masuk :</p>
+          </div>
+          <div class="col-6">
+            <p class="text-right mr-4">${formatPrice(
+              dataReceiptBill.cash_in
+            )}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <p class="text-right mr-4">Uang Kembali :</p>
+          </div>
+          <div class="col-6">
+            <p class="text-right mr-4">${formatPrice(
+              dataReceiptBill.cash_out
+            )}</p>
+          </div>
+        </div>
+        <h6 class="text-center">Waktu Pembayaran : ${formatDate(
+          dataReceiptBill.Timestamp
+        )}</h6>
+        <h5 class="text-center">Terimakasih</h5>
+      </div>
+    `;
+    return receiptContent;
+  };
+  
 
   if (loading) return <p>Loading...</p>;
 
@@ -473,8 +714,9 @@ export const PointOfSales = () => {
                   <button
                     className="mt-3 btn btn-inverse-info btn-lg btn-block"
                     onClick={handleShow}
+                    disabled={selectedImages.length === 0}
                   >
-                    Bayar
+                    Lanjut Proses
                   </button>
                 </div>
               </div>
@@ -496,9 +738,12 @@ export const PointOfSales = () => {
             <div className="card-body">
               <h4 className="card-title">Pembayaran</h4>
               <p>Order No : Order#109</p>
-              <p>Klien : Guest</p>              
+              <p>Klien : Guest</p>
               {/* <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p> */}
-              <h3 className="text-warning"> Total Pembayaran {formatPrice(getTotalPrice())} </h3>
+              <h3 className="text-warning">
+                {" "}
+                Total Pembayaran {formatPrice(getTotalPrice())}{" "}
+              </h3>
               <form onSubmit={handleSubmit} className="forms-sample">
                 <Form.Group>
                   <label className="mt-2" htmlFor="exampleFormControlSelect2">
@@ -523,47 +768,53 @@ export const PointOfSales = () => {
                 </Form.Group>
 
                 {selectedPayment && (
-                <>
-                  {selectedPayment === 'Cash' && (
-                    <Form.Group>
-                      <label htmlFor="cashInfo">Uang yang Dibayar</label>
-                      <Form.Control
-                        type="text"
-                        id="cashInfo"
-                        className="text-white"
-                        placeholder="Berapa uang cash yang diterima"
-                        value={cashPaidDisplay}
-                        onChange={handleCashChange}
-                      />
-                      {cashPaid && (
-                        <h3 className={changeTextClass()}>
-                          {isCashEnough()
-                            ? `Kembalian: ${formatPrice(calculateChange())}`
-                            : 'Uang yang diberikan tidak cukup'}
-                        </h3>
-                        
-                      )}
-                    </Form.Group>
-                  )}
-                   {selectedPayment === 'Transfer Mandiri' && (
-                    <Form.Group>
-                      <p>Silahkan transfer ke nomor rekening di bawah ini</p>
-                      <label>Nomor Rekening Mandiri</label>
-                      <h3 className="text-success">1330-0109-5082-2</h3>                      
-                      {/* ini masih rekening mandiri */}
-                    </Form.Group>
-                  )}
-                   {selectedPayment === 'Transfer BCA' && (
-                    <Form.Group>
-                      <p>Silahkan transfer ke nomor rekening di bawah ini</p>
-                      <label>Nomor Rekening BCA</label>
-                      <h3 className="text-success">8410-0875-89</h3>
-                    </Form.Group>
-                  )}
-                </>
-              )}
-                              
-                <button type="submit" className="btn btn-inverse-info btn-lg btn-block mr-5">
+                  <>
+                    {selectedPayment === "Cash" && (
+                      <Form.Group>
+                        <label htmlFor="cashInfo">Uang yang Dibayar</label>
+                        <Form.Control
+                          type="text"
+                          id="cashInfo"
+                          className="text-white"
+                          placeholder="Berapa uang cash yang diterima"
+                          value={cashPaidDisplay}
+                          onChange={handleCashChange}
+                        />
+                        {cashPaid && (
+                          <h3 className={changeTextClass()}>
+                            {isCashEnough()
+                              ? `Kembalian: ${formatPrice(calculateChange())}`
+                              : "Uang yang diberikan tidak cukup"}
+                          </h3>
+                        )}
+                      </Form.Group>
+                    )}
+                    {selectedPayment === "Transfer Mandiri" && (
+                      <Form.Group>
+                        <p>Silahkan transfer ke nomor rekening di bawah ini</p>
+                        <label>Nomor Rekening Mandiri</label>
+                        <h3 className="text-success">1330-0109-5082-2</h3>
+                        {/* ini masih rekening mandiri */}
+                      </Form.Group>
+                    )}
+                    {selectedPayment === "Transfer BCA" && (
+                      <Form.Group>
+                        <p>Silahkan transfer ke nomor rekening di bawah ini</p>
+                        <label>Nomor Rekening BCA</label>
+                        <h3 className="text-success">8410-0875-89</h3>
+                      </Form.Group>
+                    )}
+                  </>
+                )}
+
+                <button
+                  type="submit"
+                  className="btn btn-inverse-info btn-lg btn-block mr-5"
+                  disabled={
+                    !selectedPayment ||
+                    (selectedPayment === "Cash" && !isCashEnough())
+                  }
+                >
                   Bayar
                 </button>
                 <button
@@ -577,6 +828,119 @@ export const PointOfSales = () => {
             </div>
           </div>
         </Modal.Body>
+      </Modal>
+      <Modal
+        show={loadingModal}
+        onHide={() => {}}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <div className="text-center">
+            <p>Saving...</p>
+            <ProgressBar animated now={100} />
+          </div>
+        </Modal.Body>
+      </Modal>
+      <Modal
+        show={doneModal}
+        onHide={handleClose2}
+        dialogClassName="modal-90w"
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Receipt</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="bg-white text-dark p-4">
+            {dataReceiptBill ? (
+              <>
+                <h2 className="text-center">Kedai Ceu Monny</h2>
+                <h5 className="text-center">
+                  Villa Bogor Indah 6, Blok B6 No.10. Sukaraja, Kabupaten Bogor
+                </h5>
+                <h5 className="text-center">+62 821-1249-2060</h5>
+                {/* <p>Bill ID: {dataReceiptBill.id}</p> */}
+                <p>Order#{dataReceiptBill.id}</p>
+                {console.log(dataReceiptBill)}
+                <h5 className="text-center">
+                  ===========================================
+                </h5>
+                {dataReceiptDetailBill ? (
+                  <>
+                    {dataReceiptDetailBill.map((item) => (
+                      <div key={item.id} className="row">
+                        <div className="col-6">
+                          <div className="row">
+                            <h6 className="text-left ml-4">{item.jumlah}</h6>
+                            <h6 className="text-left ml-4">{item.nama_menu}</h6>
+                          </div>
+                        </div>
+                        <div className="col-6">
+                          <h6 className="text-right mr-4">
+                            {formatPrice(item.total_harga)}
+                          </h6>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <p>Loading detail items...</p>
+                )}
+                <h5 className="text-center">
+                  ===========================================
+                </h5>
+                <h6 className="text-right mr-4">
+                  Total Amount: {formatPrice(dataReceiptBill.total)}
+                </h6>
+                <p className="text-right mr-4">
+                  Jenis Pembayaran: {dataReceiptBill.jenis_pembayaran}
+                </p>
+                <p className="text-right mr-4">
+                  Uang Masuk : {formatPrice(dataReceiptBill.cash_in)}
+                </p>
+                <p className="text-right mr-4">
+                  Uang Kembali : {formatPrice(dataReceiptBill.cash_out)}
+                </p>
+                <h5 className="text-center">
+                  ===========================================
+                </h5>
+                <h6 className="text-center">
+                  Waktu Pembayaran : {formatDate(dataReceiptBill.Timestamp)}
+                </h6>
+                <h5 className="text-center">Terimakasih</h5>
+              </>
+            ) : (
+              <p>Loading items...</p>
+            )}
+          </div>
+          <div>
+            <button
+              className="mt-3 btn btn-inverse-info btn-lg btn-block"
+              onClick={printReceipt}
+            >
+              Print Resi
+            </button>
+            {/* <button
+              className="mt-3 btn btn-inverse-info btn-lg btn-block"
+              onClick={handleShow}
+            >
+              Kirim Email
+            </button> */}
+          </div>
+
+          {/* <h4>Modal Content Goes Here</h4>
+          <p>
+            This modal will take up the entire screen. You can add any content
+            here.
+          </p> */}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="btn btn-inverse-danger btn-lg" onClick={handleClose2}>
+            Close
+          </Button>         
+        </Modal.Footer>
       </Modal>
     </>
   );
