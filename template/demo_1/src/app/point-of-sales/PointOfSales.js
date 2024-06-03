@@ -4,6 +4,7 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import "react-loading-wrapper/dist/index.css";
 import Slider from "react-slick";
+import TimeSpent from "./timestamphelper";
 
 export const PointOfSales = () => {
   const sliderSettings = {
@@ -16,35 +17,13 @@ export const PointOfSales = () => {
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingModal, setLoadingModal] = useState(false);
+  const [saveBillModal, setSaveBillModal] = useState(false);
   const [doneModal, setDoneModal] = useState(false);
-
-  const handleDelete = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8090/api/product", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: parseInt(rowid) }), // Replace with your JSON data
-      });
-
-      if (response.ok) {
-        console.log("Item deleted successfully");
-        // Perform any additional actions upon successful deletion
-      } else {
-        console.error("Error deleting item:", response.status);
-        // Handle the error appropriately
-      }
-
-      // Update the state or perform any other necessary actions
-    } catch (error) {
-      // Handle error
-      console.error("Error deleting item:", error);
-    }
-  };
 
   const handleClose = () => setShow(false);
   const handleClose2 = () => setDoneModal(false);
+  const handleCloseSaveBill = () => setSaveBillModal(false);
+  const handleShowSaveBill = () => setSaveBillModal(true);
   const handleShow = (e) => {
     setShow(true);
     setRowid(e.currentTarget.value);
@@ -52,6 +31,7 @@ export const PointOfSales = () => {
   const [dataMakanan, setDataMakanan] = useState(null);
   const [dataMinuman, setDataMinuman] = useState(null);
   const [dataCemilan, setDataCemilan] = useState(null);
+  const [dataSavedBill, setSavedBill] = useState(null);
   const [dataReceiptBill, setDataReceiptBill] = useState(null);
   const [dataReceiptDetailBill, setDataReceiptDetailBill] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -210,6 +190,69 @@ export const PointOfSales = () => {
       setLoadingModal(false); // Hide loading modal
     }
   };
+  const handleSaveBill = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    setLoadingModal(true); // Show loading modal
+
+    formData.append("nama_bill", "OrderSaveBill");
+    formData.append("id_klien", 1);
+    formData.append("nama_klien", "guest");
+    formData.append("total", getTotalPrice());
+    formData.append("jenis_pembayaran", "null");
+    formData.append("cash_in", 0);
+    formData.append("cash_out", 0);
+    formData.append("paid", 0);
+
+    const modifiedSelectedImages = selectedImages.map(
+      ({ id, ...rest }) => rest
+    );
+
+    try {
+      // API call for bill
+      const billResponse = await axios.post(
+        "http://127.0.0.1:8090/api/transaction/create_bill",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const billId = billResponse.data.data.id;
+      setDataReceiptBill(billResponse.data.data);
+      console.log(billId);
+      // Include other necessary data for detail_bill here
+      const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
+        ...image,
+        id_bill: billId,
+      }));
+
+      // API call for detail_bill
+      const detailBillResponse = await axios.post(
+        "http://127.0.0.1:8090/api/transaction/create_detail_bill_json",
+        modifiedSelectedImages2
+      );
+
+      console.log("Detail bill response:", detailBillResponse.data.data);
+      setDataReceiptDetailBill(detailBillResponse.data.data);
+      // const detailBillResponse = await axios.post("http://127.0.0.1:8090/api/transaction/create_detail_bill_json", {
+      //  modifiedSelectedImages
+      // });
+
+      // Clear selectedImages and selectedPayment after sending data
+      setSelectedImages([]);
+      setSelectedPayment("");
+
+      // Close the modal after successful submission s
+      handleClose();
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    } finally {
+      setLoadingModal(false); // Hide loading modal
+    }
+  };
 
   const getTotalPrice = () => {
     return selectedImages.reduce(
@@ -291,9 +334,26 @@ export const PointOfSales = () => {
 
       setLoading(false);
     };
+    const fetchData4 = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          "http://127.0.0.1:8090/api/transaction/show_saved_bill"
+        ); //ngambil api dari transaction
+        setSavedBill(data.data);
+        // console.log(data.data)
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        return <div>Error {e} </div>;
+      }
+
+      setLoading(false);
+    };
     fetchData();
     fetchData2();
     fetchData3();
+    fetchData4();
     return;
     // dispatch(getSandwichLists());
   }, []);
@@ -305,6 +365,8 @@ export const PointOfSales = () => {
     printWindow.document.close();
     printWindow.print();
   };
+
+  // <ReceiptHelperContent dataReceiptBill={dataReceiptBill}/>
 
   const generateReceiptContent = () => {
     const receiptContent = `
@@ -432,9 +494,7 @@ export const PointOfSales = () => {
             <p class="text-right mr-4">Jenis Pembayaran:</p>
           </div>
           <div class="col-6">
-            <p class="text-right mr-4">${
-              dataReceiptBill.jenis_pembayaran
-            }</p>
+            <p class="text-right mr-4">${dataReceiptBill.jenis_pembayaran}</p>
           </div>
         </div>
         <div class="row">
@@ -465,7 +525,6 @@ export const PointOfSales = () => {
     `;
     return receiptContent;
   };
-  
 
   if (loading) return <p>Loading...</p>;
 
@@ -488,6 +547,15 @@ export const PointOfSales = () => {
     );
   }
   if (!dataCemilan) {
+    return (
+      <>
+        <div>
+          <h1>Loading ...</h1>
+        </div>
+      </>
+    );
+  }
+  if (!dataSavedBill) {
     return (
       <>
         <div>
@@ -651,7 +719,19 @@ export const PointOfSales = () => {
           <div className="col-md-4 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
-                <h4 className="card-title">Bill</h4>
+                <div className="row">
+                  <div className="col-6">
+                    <h4 className="card-title">Transaksi</h4>
+                  </div>
+                  <div className="col-6">
+                    <button
+                      className="btn btn-inverse-primary"
+                      onClick={handleShowSaveBill}
+                    >
+                      Transaksi yang tersimpan
+                    </button>
+                  </div>
+                </div>
                 <div className="aligner-wrapper">
                   {/* <h2>Selected Images:</h2> */}
                   {selectedImages.length > 0 ? (
@@ -717,6 +797,13 @@ export const PointOfSales = () => {
                     disabled={selectedImages.length === 0}
                   >
                     Lanjut Proses
+                  </button>
+                  <button
+                    className="mt-3 btn btn-inverse-warning btn-lg btn-block"
+                    onClick={handleSaveBill}
+                    disabled={selectedImages.length === 0}
+                  >
+                    Save Bill
                   </button>
                 </div>
               </div>
@@ -843,6 +930,58 @@ export const PointOfSales = () => {
         </Modal.Body>
       </Modal>
       <Modal
+        show={saveBillModal}
+        onHide={handleCloseSaveBill}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <div className="card">
+            <div className="card-body">
+              <h4 className="card-title">Transaksi yang tersimpan</h4>
+              <p className="card-description">
+                {" "}
+                list transaksi yang belum dibayar
+              </p>
+              <div className="table-responsive">
+                <table className="table table-hover text-white table-striped">
+                  <thead>
+                    <tr>
+                      <th>Nama Transaksi</th>
+                      <th>Waktu Transaksi</th>
+                      <th>Lama Transaksi Tersimpan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dataSavedBill.map((row, index) => (
+                      <>
+                        <tr>
+                          <td>{row.Bill.nama_bill}</td>
+                          <td>{formatDate(row.Bill.Timestamp)}</td>
+                          <td>
+                            <label className="badge badge-info">
+                            <TimeSpent timestamp={row.Bill.Timestamp} />
+                            </label>
+                          </td>
+                        </tr>
+                      </>
+                    ))}                  
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="btn btn-inverse-danger btn-lg"
+            onClick={handleCloseSaveBill}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal
         show={doneModal}
         onHide={handleClose2}
         dialogClassName="modal-90w"
@@ -937,9 +1076,12 @@ export const PointOfSales = () => {
           </p> */}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="btn btn-inverse-danger btn-lg" onClick={handleClose2}>
+          <Button
+            variant="btn btn-inverse-danger btn-lg"
+            onClick={handleClose2}
+          >
             Close
-          </Button>         
+          </Button>
         </Modal.Footer>
       </Modal>
     </>
