@@ -17,13 +17,41 @@ export const PointOfSales = () => {
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingModal, setLoadingModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [saveBillModal, setSaveBillModal] = useState(false);
   const [doneModal, setDoneModal] = useState(false);
+  const [billToDelete, setBillToDelete] = useState(null); // State to keep track of the bill to delete
 
   const handleClose = () => setShow(false);
   const handleClose2 = () => setDoneModal(false);
   const handleCloseSaveBill = () => setSaveBillModal(false);
-  const handleShowSaveBill = () => setSaveBillModal(true);
+  const handleCloseDeleteModal = () => {
+    setDeleteModal(false);
+    setSaveBillModal(true);
+  };
+  const handleShowDeleteModal = (billId) => {
+    setSaveBillModal(false);
+    setBillToDelete(billId);
+    console.log(billId);
+    setDeleteModal(true);
+  };
+  const handleShowSaveBill = () => {
+    const fetchData4 = async () => {
+      try {
+        const { data } = await axios.get(
+          "http://127.0.0.1:8090/api/transaction/show_saved_bill"
+        ); //ngambil api dari transaction
+        setSavedBill(data.data);
+        // console.log(data.data)
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        return <div>Error {e} </div>;
+      }
+    };
+    fetchData4();
+    setSaveBillModal(true);
+  };
   const handleShow = (e) => {
     setShow(true);
     setRowid(e.currentTarget.value);
@@ -31,7 +59,9 @@ export const PointOfSales = () => {
   const [dataMakanan, setDataMakanan] = useState(null);
   const [dataMinuman, setDataMinuman] = useState(null);
   const [dataCemilan, setDataCemilan] = useState(null);
+  const [dataBarbershop, setDataBarbershop] = useState(null);
   const [dataSavedBill, setSavedBill] = useState(null);
+  const [currentBillId, setCurrentBillId] = useState(0); // State variable to keep track of current bill id
   const [dataReceiptBill, setDataReceiptBill] = useState(null);
   const [dataReceiptDetailBill, setDataReceiptDetailBill] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -126,11 +156,27 @@ export const PointOfSales = () => {
     setCashPaidDisplay(formattedValue);
   };
 
+  const handleRowClick = async (billId) => {
+    setCurrentBillId(billId);
+    try {
+      const response = await fetch(
+        `http://localhost:8090/api/transaction/show_detail_bill/${billId}`
+      );
+      const data = await response.json();
+      console.log(data.data);
+      setSelectedImages(data.data); // assuming data is an array of images
+      setSaveBillModal(false);
+    } catch (error) {
+      console.error("Error fetching bill details:", error);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
     setLoadingModal(true); // Show loading modal
 
+    formData.append("id", currentBillId);
     formData.append("nama_bill", "#Order#109");
     formData.append("id_klien", 1);
     formData.append("nama_klien", "guest");
@@ -180,6 +226,7 @@ export const PointOfSales = () => {
       // Clear selectedImages and selectedPayment after sending data
       setSelectedImages([]);
       setSelectedPayment("");
+      setCurrentBillId(0);
 
       // Close the modal after successful submission s
       handleClose();
@@ -190,11 +237,47 @@ export const PointOfSales = () => {
       setLoadingModal(false); // Hide loading modal
     }
   };
+  const handleDeleteBill = async (event) => {
+    event.preventDefault();
+    setLoadingModal(true); // Show loading modal
+    setDeleteModal(false);
+
+    const formData = new FormData();
+    formData.append("id", billToDelete);
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8090/api/transaction/delete_bill`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data.message);
+      setLoadingModal(false);
+      setDeleteModal(false);
+      setSelectedImages([]);
+      setSelectedPayment("");
+      setCurrentBillId(0);
+
+      // Optionally, refresh the dataSavedBill list or remove the deleted item from the state
+    } catch (error) {
+      console.error("There was an error deleting the bill!", error);
+      setDeleteModal(true);
+
+      setLoadingModal(false); // Show loading modal
+    }
+  };
+
   const handleSaveBill = async (event) => {
     event.preventDefault();
     const formData = new FormData();
     setLoadingModal(true); // Show loading modal
 
+    formData.append("id", currentBillId);
+    formData.append("nama_bill", "OrderSaveBill");
     formData.append("nama_bill", "OrderSaveBill");
     formData.append("id_klien", 1);
     formData.append("nama_klien", "guest");
@@ -244,6 +327,7 @@ export const PointOfSales = () => {
       // Clear selectedImages and selectedPayment after sending data
       setSelectedImages([]);
       setSelectedPayment("");
+      setCurrentBillId(0);
 
       // Close the modal after successful submission s
       handleClose();
@@ -334,6 +418,21 @@ export const PointOfSales = () => {
 
       setLoading(false);
     };
+    const fetchData5 = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(
+          "http://127.0.0.1:8090/api/product/barbershop"
+        ); //ngambil api dari auth me
+        setDataBarbershop(data);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        return <div>Error {e} </div>;
+      }
+
+      setLoading(false);
+    };
     const fetchData4 = async () => {
       setLoading(true);
       try {
@@ -354,6 +453,7 @@ export const PointOfSales = () => {
     fetchData2();
     fetchData3();
     fetchData4();
+    fetchData5();
     return;
     // dispatch(getSandwichLists());
   }, []);
@@ -409,8 +509,52 @@ export const PointOfSales = () => {
             margin:0px;
         }
 
-        #receipt-modal .col-6 {
-            flex: 0 0 50%;
+        .col-1 {
+            width: 8.33%;
+        }
+
+        .col-2 {
+            width: 16.66%;
+        }
+
+        .col-3 {
+            width: 25%;
+        }
+
+        .col-4 {
+            width: 33.33%;
+        }
+
+        .col-5 {
+            width: 41.66%;
+        }
+
+        .col-6 {
+            width: 50%;
+        }
+
+        .col-7 {
+            width: 58.33%;
+        }
+
+        .col-8 {
+            width: 66.66%;
+        }
+
+        .col-9 {
+            width: 75%;
+        }
+
+        .col-10 {
+            width: 83.33%;
+        }
+
+        .col-11 {
+            width: 91.66%;
+        }
+
+        .col-12 {
+            width: 100%;
         }
 
         #receipt-modal p {
@@ -422,6 +566,10 @@ export const PointOfSales = () => {
             text-align: center;
         }
 
+        #receipt-modal .text-menu {
+            font-size:8px;
+            
+        }
         #receipt-modal .text-left {
             text-align: left;
             
@@ -463,8 +611,12 @@ export const PointOfSales = () => {
                     <div class="row" style="padding:0px; margin-top:-30px; margin-bottom:-20px">
                       <div class="col-6">
                         <div class="row">
-                          <h6 class="text-left ml-4">${item.jumlah}</h6>
-                          <h6 class="text-left ml-4">${item.nama_menu}</h6>
+                          <div class="col-2">
+                              <h6 class="text-menu text-left ml-4">${item.jumlah}</h6>
+                          </div>
+                          <div class="col-10">
+                            <h6 class="text-menu text-left">${item.nama_menu}</h6>
+                          </div>
                         </div>
                       </div>
                       <div class="col-6">
@@ -555,7 +707,7 @@ export const PointOfSales = () => {
       </>
     );
   }
-  if (!dataSavedBill) {
+  if (!dataBarbershop) {
     return (
       <>
         <div>
@@ -564,21 +716,24 @@ export const PointOfSales = () => {
       </>
     );
   }
+  if (!dataSavedBill) {
+  }
 
   const datas = dataMakanan.data;
   const datas2 = dataMinuman.data;
   const datas3 = dataCemilan.data;
+  const datas4 = dataBarbershop.data;
 
   return (
     <>
       <div>
         <div className="page-header">
-          <h3 className="page-title"> Point of Sales </h3>
+          <h3 className="page-title"> Kasir </h3>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
                 <a href="!#" onClick={(event) => event.preventDefault()}>
-                  Point of Sales
+                  Kasir
                 </a>
               </li>
               {/* <li className="breadcrumb-item active" aria-current="page">Basic tables</li> */}
@@ -596,12 +751,12 @@ export const PointOfSales = () => {
                         <h4 className="card-title">Makanan</h4>
                         <div className="row">
                           {datas.map((row, index) => (
-                            <div className="col-sm-6 col-md-4 col-lg-4">
+                            <div className="col-sm-6 col-md-3 col-lg-3">
                               <div className="row justify-content-center">
                                 <div
                                   style={{
-                                    height: 200,
-                                    width: 200,
+                                    height: 150,
+                                    width: 150,
                                     position: "relative",
                                     overflow: "hidden",
                                   }}
@@ -620,11 +775,11 @@ export const PointOfSales = () => {
                                   />
                                 </div>
                               </div>
-                              <div className="row justify-content-center">
-                                <h4>{row.nama_menu}</h4>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>{row.nama_menu}</h6>
                               </div>
-                              <div className="row justify-content-center">
-                                <h4>{row.harga}</h4>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>{formatPrice(row.harga)}</h6>
                               </div>
                             </div>
                           ))}
@@ -635,12 +790,12 @@ export const PointOfSales = () => {
                         <div className="row">
                           {datas2.map((row, index) => (
                             <>
-                              <div className="col-sm-6 col-md-4 col-lg-4">
+                              <div className="col-sm-6 col-md-3 col-lg-3">
                                 <div className="row justify-content-center">
                                   <div
                                     style={{
-                                      height: 200,
-                                      width: 200,
+                                      height: 150,
+                                      width: 150,
                                       position: "relative",
                                       overflow: "hidden",
                                     }}
@@ -659,11 +814,11 @@ export const PointOfSales = () => {
                                     />
                                   </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                  <h4>{row.nama_menu}</h4>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
                                 </div>
-                                <div className="row justify-content-center">
-                                  <h4>{row.harga}</h4>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
                                 </div>
                               </div>
                             </>
@@ -675,12 +830,12 @@ export const PointOfSales = () => {
                         <div className="row">
                           {datas3.map((row, index) => (
                             <>
-                              <div className="col-sm-6 col-md-4 col-lg-4">
+                              <div className="col-sm-6 col-md-3 col-lg-3">
                                 <div className="row justify-content-center">
                                   <div
                                     style={{
-                                      height: 200,
-                                      width: 200,
+                                      height: 150,
+                                      width: 150,
                                       position: "relative",
                                       overflow: "hidden",
                                     }}
@@ -699,11 +854,51 @@ export const PointOfSales = () => {
                                     />
                                   </div>
                                 </div>
-                                <div className="row justify-content-center">
-                                  <h4>{row.nama_menu}</h4>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
                                 </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div>
+                              </div>
+                            </>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 className="card-title">Barbershop</h4>
+                        <div className="row">
+                          {datas4.map((row, index) => (
+                            <>
+                              <div className="col-sm-6 col-md-3 col-lg-3">
                                 <div className="row justify-content-center">
-                                  <h4>{row.harga}</h4>
+                                  <div
+                                    style={{
+                                      height: 150,
+                                      width: 150,
+                                      position: "relative",
+                                      overflow: "hidden",
+                                    }}
+                                  >
+                                    <Image
+                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      alt={`${row.nama_menu}`}
+                                      style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                      }}
+                                      onClick={() => handleImageClick(row)}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
                                 </div>
                               </div>
                             </>
@@ -725,13 +920,16 @@ export const PointOfSales = () => {
                   </div>
                   <div className="col-6">
                     <button
-                      className="btn btn-inverse-primary"
+                      className="btn btn-primary"
                       onClick={handleShowSaveBill}
                     >
                       Transaksi yang tersimpan
                     </button>
                   </div>
                 </div>
+                <h6>
+                  Order: {currentBillId === 0 ? "New" : `#${currentBillId}`}
+                </h6>
                 <div className="aligner-wrapper">
                   {/* <h2>Selected Images:</h2> */}
                   {selectedImages.length > 0 ? (
@@ -792,14 +990,14 @@ export const PointOfSales = () => {
                     </div>
                   </div>
                   <button
-                    className="mt-3 btn btn-inverse-info btn-lg btn-block"
+                    className="mt-3 btn btn-info btn-lg btn-block"
                     onClick={handleShow}
                     disabled={selectedImages.length === 0}
                   >
                     Lanjut Proses
                   </button>
                   <button
-                    className="mt-3 btn btn-inverse-warning btn-lg btn-block"
+                    className="mt-3 btn btn-warning btn-lg btn-block"
                     onClick={handleSaveBill}
                     disabled={selectedImages.length === 0}
                   >
@@ -837,7 +1035,7 @@ export const PointOfSales = () => {
                     Jenis Pembayaran
                   </label>
                   <select
-                    className="form-control text-white"
+                    className="form-control text-white form-control-lg"
                     id="exampleFormControlSelect2"
                     value={selectedPayment}
                     onChange={handlePaymentChange}
@@ -896,7 +1094,7 @@ export const PointOfSales = () => {
 
                 <button
                   type="submit"
-                  className="btn btn-inverse-info btn-lg btn-block mr-5"
+                  className="btn btn-info btn-lg btn-block mr-5"
                   disabled={
                     !selectedPayment ||
                     (selectedPayment === "Cash" && !isCashEnough())
@@ -929,11 +1127,32 @@ export const PointOfSales = () => {
           </div>
         </Modal.Body>
       </Modal>
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={deleteModal}
+        onHide={handleCloseDeleteModal}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <h5>Apakah Transaksi ini ingin didelete?</h5>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteBill}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Modal
         show={saveBillModal}
         onHide={handleCloseSaveBill}
         backdrop="static"
         keyboard={false}
+        dialogClassName="modal-90w"
+        aria-labelledby="example-custom-modal-styling-title"
       >
         <Modal.Body>
           <div className="card">
@@ -944,28 +1163,49 @@ export const PointOfSales = () => {
                 list transaksi yang belum dibayar
               </p>
               <div className="table-responsive">
-                <table className="table table-hover text-white table-striped">
+                <table className="table text-white table-striped">
                   <thead>
                     <tr>
                       <th>Nama Transaksi</th>
                       <th>Waktu Transaksi</th>
                       <th>Lama Transaksi Tersimpan</th>
+                      <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {dataSavedBill.map((row, index) => (
-                      <>
-                        <tr>
-                          <td>{row.Bill.nama_bill}</td>
+                    {dataSavedBill && dataSavedBill.length > 0 ? (
+                      dataSavedBill.map((row, index) => (
+                        <tr
+                          key={index}
+                          onClick={() => handleRowClick(row.Bill.id)}
+                        >
+                          <td>{"Order#" + row.Bill.id}</td>
                           <td>{formatDate(row.Bill.Timestamp)}</td>
                           <td>
                             <label className="badge badge-info">
-                            <TimeSpent timestamp={row.Bill.Timestamp} />
+                              <TimeSpent timestamp={row.Bill.Timestamp} />
                             </label>
                           </td>
+                          <td>
+                            <Button
+                              variant="btn btn-danger"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleShowDeleteModal(row.Bill.id);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </td>
                         </tr>
-                      </>
-                    ))}                  
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">
+                          Tidak ada transaksi yang tersimpan.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -984,7 +1224,6 @@ export const PointOfSales = () => {
       <Modal
         show={doneModal}
         onHide={handleClose2}
-        dialogClassName="modal-90w"
         backdrop="static"
         keyboard={false}
       >
@@ -1010,14 +1249,31 @@ export const PointOfSales = () => {
                   <>
                     {dataReceiptDetailBill.map((item) => (
                       <div key={item.id} className="row">
-                        <div className="col-6">
+                        <div className="col-8">
                           <div className="row">
-                            <h6 className="text-left ml-4">{item.jumlah}</h6>
-                            <h6 className="text-left ml-4">{item.nama_menu}</h6>
+                            <div className="col-2">
+                              <h6
+                                style={{ fontSize: "10px" }}
+                                className="text-left ml-4"
+                              >
+                                {item.jumlah}
+                              </h6>
+                            </div>
+                            <div className="col-10">
+                              <h6
+                                style={{ fontSize: "10px" }}
+                                className="text-left"
+                              >
+                                {item.nama_menu}
+                              </h6>
+                            </div>
                           </div>
                         </div>
-                        <div className="col-6">
-                          <h6 className="text-right mr-4">
+                        <div className="col-4">
+                          <h6
+                            className="text-right mr-4"
+                            style={{ fontSize: "10px" }}
+                          >
                             {formatPrice(item.total_harga)}
                           </h6>
                         </div>
@@ -1030,22 +1286,22 @@ export const PointOfSales = () => {
                 <h5 className="text-center">
                   ===========================================
                 </h5>
-                <h6 className="text-right mr-4">
+                <h6  className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Total Amount: {formatPrice(dataReceiptBill.total)}
                 </h6>
-                <p className="text-right mr-4">
+                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Jenis Pembayaran: {dataReceiptBill.jenis_pembayaran}
                 </p>
-                <p className="text-right mr-4">
+                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Uang Masuk : {formatPrice(dataReceiptBill.cash_in)}
                 </p>
-                <p className="text-right mr-4">
+                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Uang Kembali : {formatPrice(dataReceiptBill.cash_out)}
                 </p>
                 <h5 className="text-center">
                   ===========================================
                 </h5>
-                <h6 className="text-center">
+                <h6  className="text-center" style={{ fontSize: "10px" }}>
                   Waktu Pembayaran : {formatDate(dataReceiptBill.Timestamp)}
                 </h6>
                 <h5 className="text-center">Terimakasih</h5>
@@ -1056,7 +1312,7 @@ export const PointOfSales = () => {
           </div>
           <div>
             <button
-              className="mt-3 btn btn-inverse-info btn-lg btn-block"
+              className="mt-3 btn btn-success btn-lg btn-block"
               onClick={printReceipt}
             >
               Print Resi

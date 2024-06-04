@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import bsCustomFileInput from "bs-custom-file-input";
 import ModalConfirmation from "../shared/ModalConfirmation";
 
-export class CreatePointOfSales extends Component {
+export class CreateRecap extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -247,4 +247,4 @@ export class CreatePointOfSales extends Component {
   }
 }
 
-export default CreatePointOfSales;
+export default CreateRecap;

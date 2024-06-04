@@ -5,6 +5,8 @@ import Spinner from '../app/shared/Spinner';
 import Inventory from './Inventory/Inventory';
 import CreateInventory from './Inventory/CreateInventory';
 import PointOfSales from './point-of-sales/PointOfSales';
+import Recap from './Recap/Recap';
+import CreateRecap from './Recap/CreateRecap';
 
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 
@@ -35,6 +37,9 @@ class AppRoutes extends Component {
           <Route exact path="/dashboard" component={ Dashboard } />
           <Route path="/inventory/show" component={ Inventory } />
           <Route path="/inventory/create" component={ CreateInventory } />
+
+          <Route path="/recap/show" component={ Recap } />
+          <Route path="/recap/create" component={ CreateRecap } />
 
           <Route path="/pos" component={ PointOfSales } />
 
