@@ -83,16 +83,27 @@ export class Dashboard extends Component {
                 <div className="row align-items-center">
                   <div className="col-4 col-sm-3 col-xl-4 mt-2">
                     <img
-                      src={require("../../assets/images/logo-morning-mood-type(5).png")}
+                      src={require("../../assets/logo-ceu-monny.png")}
                       // src={require("../../assets/images/dashboard/Group126@2x.png")}
                       className="gradient-corona-img img-fluid"
                       alt="banner"
                     />
                   </div>
-                  <div className="col-8 col-sm-7" style={{marginLeft:"30px"}}>
-                    <h4 className="mb-1 mb-sm-0">Lets Get Started, Contribute your Morning Mood !</h4>
-                    <p className="mb-0 font-weight-normal d-none d-sm-block">
+                  <div
+                    className="col-8 col-sm-7"
+                    style={{ marginLeft: "30px" }}
+                  >
+                    {/* <h4 className="mb-1 mb-sm-0">
+                      Lets Get Started, Contribute your Morning Mood !
+                    </h4> */}
+                    <h4 className="mb-1 mb-sm-0">
+                     YOK KERJA YOK
+                    </h4>
+                    {/* <p className="mb-0 font-weight-normal d-none d-sm-block">
                       We are thrilled wth your passion
+                    </p> */}
+                    <p className="mb-0 font-weight-normal d-none d-sm-block">
+                     GAK KERJA GAK KAYAK BROKKKKKKKKKKKK
                     </p>
                   </div>
                   {/* <div className="col-3 col-sm-2 col-xl-2 pl-0 text-center">
@@ -206,12 +217,11 @@ export class Dashboard extends Component {
             <div className="card">
               <div className="card-body">
                 <div className="aligner-wrapper text-center">
-                    <img
-                      src={require("../../assets/images/logo-morning-mood.png")}
-                      alt="logo"
-                      style={{ width: "75%", height: "75%" }}
-                    />
-                 
+                  <img
+                    src={require("../../assets/logo-ceu-monny.png")}
+                    alt="logo"
+                    style={{ width: "75%", height: "75%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -341,7 +351,7 @@ export class Dashboard extends Component {
           </div>
         </div>
         <div className="row">
-        <div className="col-md-4 grid-margin stretch-card">
+          <div className="col-md-4 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
                 <h4 className="card-title">Transaction History</h4>

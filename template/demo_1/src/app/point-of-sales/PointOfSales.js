@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import "react-loading-wrapper/dist/index.css";
 import Slider from "react-slick";
 import TimeSpent from "./timestamphelper";
+import logo from "../../assets/logo-ceu-monny.png";
 
 export const PointOfSales = () => {
   const sliderSettings = {
@@ -53,6 +54,7 @@ export const PointOfSales = () => {
     setSaveBillModal(true);
   };
   const handleShow = (e) => {
+    console.log(selectedImages)
     setShow(true);
     setRowid(e.currentTarget.value);
   };
@@ -111,7 +113,7 @@ export const PointOfSales = () => {
   const handleCountChange = (id, newCount) => {
     setSelectedImages((prevState) =>
       prevState.map((img) =>
-        img.id === id ? { ...img, jumlah: parseInt(newCount) || 0 } : img
+        img.id === id ? { ...img, jumlah: parseInt(newCount) || 0, total_harga: parseInt(newCount)*img.harga } : img
       )
     );
   };
@@ -471,209 +473,130 @@ export const PointOfSales = () => {
   const generateReceiptContent = () => {
     const receiptContent = `
     <style>
-        body * {
-            visibility: hidden;
+        * {
+            font-size: 12px;
+            font-family: 'Times New Roman';
         }
 
-        #receipt-modal,
-        #receipt-modal * {
-            visibility: visible;
+        td,
+        th,
+        tr,
+        table {
+            /* border-top: 1px solid black; */
+            border-collapse: collapse;
         }
 
-        #receipt-modal {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            width: 58mm;
-            /* Adjust the width as needed */
-            margin: 0 auto;
+
+        td.description,
+        th.description {
+            width: 90px;
+            max-width: 90px;
         }
 
-        #receipt-modal h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
+        td.quantity,
+        th.quantity {
+            width: 15px;
+            max-width: 15px;
+            word-break: break-all;
         }
 
-        #receipt-modal hr {
+        td.price,
+        th.price {
+            width: 50px;
+            max-width: 50px;
+            word-break: break-all;
+        }
+
+        .centered {
+            text-align: center;
+            align-content: center;
+        }
+
+        .ticket {
+            width: 155px;
+            max-width: 155px;
+        }
+
+        img {
+            max-width: inherit;
+            width: inherit;
+        }
+
+        hr {
             border: none;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid black;
             margin: 10px 0;
         }
-
-        #receipt-modal .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0px;
-            margin:0px;
-        }
-
-        .col-1 {
-            width: 8.33%;
-        }
-
-        .col-2 {
-            width: 16.66%;
-        }
-
-        .col-3 {
-            width: 25%;
-        }
-
-        .col-4 {
-            width: 33.33%;
-        }
-
-        .col-5 {
-            width: 41.66%;
-        }
-
-        .col-6 {
-            width: 50%;
-        }
-
-        .col-7 {
-            width: 58.33%;
-        }
-
-        .col-8 {
-            width: 66.66%;
-        }
-
-        .col-9 {
-            width: 75%;
-        }
-
-        .col-10 {
-            width: 83.33%;
-        }
-
-        .col-11 {
-            width: 91.66%;
-        }
-
-        .col-12 {
-            width: 100%;
-        }
-
-        #receipt-modal p {
-            margin: 5px 0;
-            font-size: 10px;
-        }
-
-        #receipt-modal .text-center {
-            text-align: center;
-        }
-
-        #receipt-modal .text-menu {
-            font-size:8px;
-            
-        }
-        #receipt-modal .text-left {
-            text-align: left;
-            
-        }
-
-        #receipt-modal .text-right {
+        .text-right {
             text-align: right;
-            
+            margin-left: auto;
+            margin-right : 10px;
         }
 
-        #receipt-modal .text-dark {
-            color: #000 !important;
-        }
+        @media print {
 
-        #receipt-modal .bg-white {
-            background-color: #fff !important;
-        }
-
-        #receipt-modal .text-success {
-            color: #28a745 !important;
-        }
-
-        #receipt-modal .text-danger {
-            color: #dc3545 !important;
+            .hidden-print,
+            .hidden-print * {
+                display: none !important;
+            }
         }
     </style>
-  
-      <div id="receipt-modal">
-        <h2 class="text-center">Kedai Ceu Monny</h2>
-        <h5 class="text-center">Villa Bogor Indah 6, Blok B6 No.10. Sukaraja, Kabupaten Bogor</h5>
-        <h5 class="text-center">+62 821-1249-2060</h5>
+
+    <div class="ticket">
+        <img src=${logo} alt="Logo">
+        <p class="centered" style="font-weight: bold;">Kedai Ceu Monny
+            <br>Villa Bogor Indah 6, Blok B6 No.10. Sukaraja, Kabupaten Bogor
+            <br>+62 821-1249-2060
+        </p>
         <p>Order#${dataReceiptBill.id}</p>
-        <hr style="margin-bottom:20px;" />
-        ${
-          dataReceiptDetailBill
-            ? dataReceiptDetailBill
-                .map(
-                  (item) => `
-                    <div class="row" style="padding:0px; margin-top:-30px; margin-bottom:-20px">
-                      <div class="col-6">
-                        <div class="row">
-                          <div class="col-2">
-                              <h6 class="text-menu text-left ml-4">${item.jumlah}</h6>
-                          </div>
-                          <div class="col-10">
-                            <h6 class="text-menu text-left">${item.nama_menu}</h6>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <h6 class="text-right mr-4">${formatPrice(
-                          item.total_harga
-                        )}</h6>
-                      </div>
-                    </div>
-                  `
-                )
-                .join("")
-            : "<p>Loading detail items...</p>"
-        }
         <hr />
-        <div class="row">
-          <div class="col-6">
-            <h6 class="text-right mr-4">Total Amount:</h6>
-          </div>
-          <div class="col-6">
-            <h6 class="text-right mr-4">${formatPrice(
-              dataReceiptBill.total
-            )}</h6>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <p class="text-right mr-4">Jenis Pembayaran:</p>
-          </div>
-          <div class="col-6">
-            <p class="text-right mr-4">${dataReceiptBill.jenis_pembayaran}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <p class="text-right mr-4">Uang Masuk :</p>
-          </div>
-          <div class="col-6">
-            <p class="text-right mr-4">${formatPrice(
-              dataReceiptBill.cash_in
-            )}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <p class="text-right mr-4">Uang Kembali :</p>
-          </div>
-          <div class="col-6">
-            <p class="text-right mr-4">${formatPrice(
-              dataReceiptBill.cash_out
-            )}</p>
-          </div>
-        </div>
-        <h6 class="text-center">Waktu Pembayaran : ${formatDate(
-          dataReceiptBill.Timestamp
-        )}</h6>
-        <h5 class="text-center">Terimakasih</h5>
-      </div>
+        <table style="width: 100%;">
+            <!-- <thead>
+                <tr>
+                    <th class="quantity">Jml.</th>
+                    <th class="description">Menu</th>
+                    <th class="price">Rp.</th>
+                </tr>
+            </thead> -->
+            <tbody>
+             ${
+               dataReceiptDetailBill
+                 ? dataReceiptDetailBill
+                     .map(
+                       (item) => `
+                  <tr style="width: 10%;">
+                    <td class="quantity">${item.jumlah}</td>
+                    <td class="description">${item.nama_menu}</td>
+                    <td class="price">${item.total_harga}</td>
+                </tr>                   
+                  `
+                     )
+                     .join("")
+                 : "<p>Loading detail items...</p>"
+             }
+            </tbody>
+        </table>
+        <hr />
+
+         <p class="text-right" style="font-weight:bold;">Total : ${formatPrice(
+           dataReceiptBill.total
+         )}
+        </p>
+        <p class="text-right">Jenis Pembayaran :
+            <br>${dataReceiptBill.jenis_pembayaran}
+        </p>
+        <p class="text-right">Uang Masuk :
+            <br>${formatPrice(dataReceiptBill.cash_in)}
+        </p>
+        <p class="text-right">Uang Keluar :
+            <br>${formatPrice(dataReceiptBill.cash_out)}
+        </p>
+        <p class="centered">Waktu Pembayaran :
+            <br>${formatDate(dataReceiptBill.Timestamp)}
+            <br>Terimakasih
+        </p>
+    </div>   
+    <script src="script.js"></script>
     `;
     return receiptContent;
   };
@@ -751,7 +674,7 @@ export const PointOfSales = () => {
                         <h4 className="card-title">Makanan</h4>
                         <div className="row">
                           {datas.map((row, index) => (
-                            <div className="col-sm-6 col-md-3 col-lg-3">
+                            <div className="col-sm-6 col-md-4 col-lg-3">
                               <div className="row justify-content-center">
                                 <div
                                   style={{
@@ -790,7 +713,7 @@ export const PointOfSales = () => {
                         <div className="row">
                           {datas2.map((row, index) => (
                             <>
-                              <div className="col-sm-6 col-md-3 col-lg-3">
+                              <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
                                   <div
                                     style={{
@@ -830,7 +753,7 @@ export const PointOfSales = () => {
                         <div className="row">
                           {datas3.map((row, index) => (
                             <>
-                              <div className="col-sm-6 col-md-3 col-lg-3">
+                              <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
                                   <div
                                     style={{
@@ -870,7 +793,7 @@ export const PointOfSales = () => {
                         <div className="row">
                           {datas4.map((row, index) => (
                             <>
-                              <div className="col-sm-6 col-md-3 col-lg-3">
+                              <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
                                   <div
                                     style={{
@@ -1286,22 +1209,22 @@ export const PointOfSales = () => {
                 <h5 className="text-center">
                   ===========================================
                 </h5>
-                <h6  className="text-right mr-4" style={{ fontSize: "10px" }}>
+                <h6 className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Total Amount: {formatPrice(dataReceiptBill.total)}
                 </h6>
-                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
+                <p className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Jenis Pembayaran: {dataReceiptBill.jenis_pembayaran}
                 </p>
-                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
+                <p className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Uang Masuk : {formatPrice(dataReceiptBill.cash_in)}
                 </p>
-                <p  className="text-right mr-4" style={{ fontSize: "10px" }}>
+                <p className="text-right mr-4" style={{ fontSize: "10px" }}>
                   Uang Kembali : {formatPrice(dataReceiptBill.cash_out)}
                 </p>
                 <h5 className="text-center">
                   ===========================================
                 </h5>
-                <h6  className="text-center" style={{ fontSize: "10px" }}>
+                <h6 className="text-center" style={{ fontSize: "10px" }}>
                   Waktu Pembayaran : {formatDate(dataReceiptBill.Timestamp)}
                 </h6>
                 <h5 className="text-center">Terimakasih</h5>

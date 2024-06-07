@@ -55,7 +55,8 @@ class Sidebar extends Component {
     return (
       <nav className="sidebar sidebar-offcanvas" id="sidebar">
         <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <a className="sidebar-brand brand-logo" href="index.html"><img src={require('../../assets/images/logo-morning-mood-type(4).png')} alt="logo" /></a>
+          {/* <a className="sidebar-brand brand-logo" href="index.html"><img src={require('../../assets/images/logo-morning-mood-type(4).png')} alt="logo" /></a> */}
+          <a className="sidebar-brand brand-logo" href="index.html"><p className='text-white'>Masih cari logo yg sesuai</p></a>
           <a className="sidebar-brand brand-logo-mini" href="index.html"><img src={require('../../assets/images/logo-morning-mood.png')} alt="logo" /></a>
         </div>
         <ul className="nav">
