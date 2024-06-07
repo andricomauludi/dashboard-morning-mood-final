@@ -1,13 +1,8 @@
-FROM node:16-alpine
+FROM node:16
 
-WORKDIR /react-docker-example/
-
-COPY public/ /react-docker-example/public
-COPY src/ /react-docker-example/src
-COPY package.json /react-docker-example/
-
-# Install dependencies
+WORKDIR /app
+COPY package*.json ./
 RUN npm install --legacy-peer-deps
-
-CMD ["npm", "start"]
-
+COPY . .
+EXPOSE 3000
+CMD npm start
