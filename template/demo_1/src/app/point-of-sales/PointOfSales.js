@@ -6,6 +6,7 @@ import "react-loading-wrapper/dist/index.css";
 import Slider from "react-slick";
 import TimeSpent from "./timestamphelper";
 import logo from "../../assets/logo-ceu-monny.png";
+import { BACKEND } from "../../constants";
 
 export const PointOfSales = () => {
   const sliderSettings = {
@@ -14,6 +15,7 @@ export const PointOfSales = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
   };
+  const apiUrl = BACKEND;
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,7 +42,7 @@ export const PointOfSales = () => {
     const fetchData4 = async () => {
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/transaction/show_saved_bill"
+          apiUrl+"/api/transaction/show_saved_bill"
         ); //ngambil api dari transaction
         setSavedBill(data.data);
         // console.log(data.data)
@@ -162,7 +164,7 @@ export const PointOfSales = () => {
     setCurrentBillId(billId);
     try {
       const response = await fetch(
-        `http://localhost:8090/api/transaction/show_detail_bill/${billId}`
+        apiUrl+`/api/transaction/show_detail_bill/${billId}`
       );
       const data = await response.json();
       console.log(data.data);
@@ -195,7 +197,7 @@ export const PointOfSales = () => {
     try {
       // API call for bill
       const billResponse = await axios.post(
-        "http://127.0.0.1:8090/api/transaction/create_bill",
+        apiUrl+"/api/transaction/create_bill",
         formData,
         {
           headers: {
@@ -215,7 +217,7 @@ export const PointOfSales = () => {
 
       // API call for detail_bill
       const detailBillResponse = await axios.post(
-        "http://127.0.0.1:8090/api/transaction/create_detail_bill_json",
+        apiUrl+"/api/transaction/create_detail_bill_json",
         modifiedSelectedImages2
       );
 
@@ -249,7 +251,7 @@ export const PointOfSales = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8090/api/transaction/delete_bill`,
+        apiUrl+`/api/transaction/delete_bill`,
         formData,
         {
           headers: {
@@ -296,7 +298,7 @@ export const PointOfSales = () => {
     try {
       // API call for bill
       const billResponse = await axios.post(
-        "http://127.0.0.1:8090/api/transaction/create_bill",
+        apiUrl+"/api/transaction/create_bill",
         formData,
         {
           headers: {
@@ -316,7 +318,7 @@ export const PointOfSales = () => {
 
       // API call for detail_bill
       const detailBillResponse = await axios.post(
-        "http://127.0.0.1:8090/api/transaction/create_detail_bill_json",
+        apiUrl+"/api/transaction/create_detail_bill_json",
         modifiedSelectedImages2
       );
 
@@ -379,7 +381,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/product/makanan"
+          apiUrl+"/api/product/makanan"
         ); //ngambil api dari auth me
         setDataMakanan(data);
         setLoading(false);
@@ -394,7 +396,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/product/minuman"
+          apiUrl+"/api/product/minuman"
         ); //ngambil api dari auth me
         setDataMinuman(data);
         setLoading(false);
@@ -409,7 +411,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/product/cemilan"
+          apiUrl+"/api/product/cemilan"
         ); //ngambil api dari auth me
         setDataCemilan(data);
         setLoading(false);
@@ -424,7 +426,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/product/barbershop"
+          apiUrl+"/api/product/barbershop"
         ); //ngambil api dari auth me
         setDataBarbershop(data);
         setLoading(false);
@@ -439,7 +441,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          "http://127.0.0.1:8090/api/transaction/show_saved_bill"
+          apiUrl+"/api/transaction/show_saved_bill"
         ); //ngambil api dari transaction
         setSavedBill(data.data);
         // console.log(data.data)
