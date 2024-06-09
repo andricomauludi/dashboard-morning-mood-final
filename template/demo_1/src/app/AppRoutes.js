@@ -5,8 +5,8 @@ import Spinner from '../app/shared/Spinner';
 import Inventory from './Inventory/Inventory';
 import CreateInventory from './Inventory/CreateInventory';
 import PointOfSales from './point-of-sales/PointOfSales';
-import Recap from './Recap/Recap';
-import CreateRecap from './Recap/CreateRecap';
+import Recap from './recap/Recap';
+import CreateRecap from './recap/CreateRecap';
 
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 

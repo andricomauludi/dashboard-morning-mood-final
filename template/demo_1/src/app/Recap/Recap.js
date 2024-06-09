@@ -4,15 +4,22 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import { Loading } from "react-loading-wrapper";
 import "react-loading-wrapper/dist/index.css";
+import { BACKEND } from "../../constants";
+import DataTable from "./DataTablePemasukan";
+import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
+
 
 export const Recap = () => {
+  const apiUrl = BACKEND;
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  
 
   const handleDelete = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8090/api/product", {
+      const response = await fetch(apiUrl+"/api/product", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +51,7 @@ export const Recap = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8090/api/transaction/show_transaction");
+        const response = await fetch(apiUrl+"/api/transaction/show_transaction");
         const datsa = await response.json();        
         setData(datsa);
       } catch (error) {
@@ -85,12 +92,12 @@ export const Recap = () => {
      
       <div>
         <div className="page-header">
-          <h3 className="page-title"> Inventory </h3>
+          <h3 className="page-title"> Rekap </h3>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
                 <a href="!#" onClick={(event) => event.preventDefault()}>
-                  Inventory
+                  Rekap
                 </a>
               </li>
               {/* <li className="breadcrumb-item active" aria-current="page">Basic tables</li> */}
@@ -98,6 +105,33 @@ export const Recap = () => {
           </nav>
         </div>
         <div className="row">
+          <div className="col-lg-12 grid-margin stretch-card">
+            <div className="card">
+              <div className="card-body">
+                <Row>
+                  <div className="col-lg-6 grid-margin stretch-card">
+                    {/* <label className="badge badge-success"> */}
+
+                    <h4 className="card-title text-success">Rekap Pemasukan</h4>
+                    {/* </label> */}
+                  </div>
+                  <div className="col-lg-6 mr-auto text-sm-right ">
+                    <a href="/inventory/create" className="align-items-right">
+                      <button className="btn btn-outline-warning">
+                        <span>
+                          <i className="mdi mdi-plus"></i>
+                        </span>
+                        Create Pemasukan
+                      </button>
+                    </a>
+                  </div>
+                </Row>
+                <div className="table-responsive">
+                <DataTable columns={COLUMNSPEMASUKAN} data={datas} />
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="col-lg-12 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
