@@ -536,7 +536,9 @@ export const PointOfSales = () => {
         }
 
         @media print {
-
+            @page {
+                margin: 0;
+            }
             .hidden-print,
             .hidden-print * {
                 display: none !important;
