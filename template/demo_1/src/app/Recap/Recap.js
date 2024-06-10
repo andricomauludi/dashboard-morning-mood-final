@@ -4,8 +4,8 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import { Loading } from "react-loading-wrapper";
 import "react-loading-wrapper/dist/index.css";
-import { BACKEND } from "../../constants";
-import DataTable from "./DataTablePemasukan";
+import { BACKEND } from "../../constants/index.js";
+import DataTable from "./DataTablePemasukan.js";
 import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
 
 
