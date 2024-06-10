@@ -8,6 +8,7 @@ import PointOfSales from './point-of-sales/PointOfSales';
 import Recap from './recap/Recap';
 import CreateRecap from './recap/CreateRecap';
 
+
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
 
 const Buttons = lazy(() => import('./basic-ui/Buttons'));
