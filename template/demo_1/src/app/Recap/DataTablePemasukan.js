@@ -6,10 +6,21 @@ import {
   useSortBy,
 } from "react-table";
 import AccordionDetailBill from "./DetailBill";
+import ModalDeleteBillPemasukan from "./ModalDeleteBillPemasukan";
 
 const Table = ({ columns, data }) => {  
   const [searchInput, setSearchInput] = useState("");
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [billToDelete, setBillToDelete] = useState("");
 
+  const handleCloseDeleteModal = () => {
+    setDeleteModal(false);    
+  };
+
+  const handleShowDeleteModal = (billId) => {
+    setDeleteModal(true);
+    setBillToDelete(billId)
+  };
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -49,7 +60,7 @@ const Table = ({ columns, data }) => {
                 <button
                   className="btn btn-outline-danger"
                   value={row.id}
-                  onClick={() => handleDelete(row.Bill.id)}
+                  onClick={() => handleShowDeleteModal(row.Bill.id)}
                 >
                   <i className="mdi mdi-delete-forever"></i>
                 </button>
@@ -287,6 +298,7 @@ const Table = ({ columns, data }) => {
           })}
         </tbody>
       </table>
+      <ModalDeleteBillPemasukan deleteModal={deleteModal} handleCloseDeleteModal={handleCloseDeleteModal} billToDelete={billToDelete} />
     </>
   );
 };
