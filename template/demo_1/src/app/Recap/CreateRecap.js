@@ -1,8 +1,6 @@
 import React, { Component, useState } from "react";
 import { Form } from "react-bootstrap";
-import DatePicker from "react-datepicker";
 import bsCustomFileInput from "bs-custom-file-input";
-import ModalConfirmation from "../shared/ModalConfirmation";
 
 export class CreateRecap extends Component {
   constructor(props) {
