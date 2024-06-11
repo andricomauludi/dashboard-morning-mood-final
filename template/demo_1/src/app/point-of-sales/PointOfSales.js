@@ -478,6 +478,8 @@ export const PointOfSales = () => {
         * {
             font-size: 12px;
             font-family: 'Times New Roman';
+            width: 155px;
+
         }
 
         td,
