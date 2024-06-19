@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Modal } from "react-bootstrap";
+import { Modal, ProgressBar } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 
+const ModalDeleteBillPemasukan = ({
+  deleteModal,
+  handleCloseDeleteModal,
+  billToDelete,
+}) => {
+  const [loadingModal, setLoadingModal] = useState(false);
 
-
-const ModalDeleteBillPemasukan = ({ deleteModal, handleCloseDeleteModal,billToDelete }) => {  
-  const handleDeleteBill = async (event) => {   
-    console.log(billToDelete) 
+  const handleDeleteBill = async (event) => {
+    console.log(billToDelete);
     // setLoadingModal(true); // Show loading modal
     // handleCloseDeleteModal;
 
@@ -39,7 +43,8 @@ const ModalDeleteBillPemasukan = ({ deleteModal, handleCloseDeleteModal,billToDe
     // }
   };
   return (
-    <Modal
+    <>
+      <Modal
         show={deleteModal}
         onHide={handleCloseDeleteModal}
         backdrop="static"
@@ -57,6 +62,20 @@ const ModalDeleteBillPemasukan = ({ deleteModal, handleCloseDeleteModal,billToDe
           </Button>
         </Modal.Footer>
       </Modal>
+      <Modal
+        show={loadingModal}
+        onHide={() => {}}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <div className="text-center">
+            <p>Saving...</p>
+            <ProgressBar animated now={100} />
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 

@@ -8,18 +8,15 @@ import { BACKEND } from "../../constants/index.js";
 import DataTable from "./DataTablePemasukan.js";
 import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
 
-
 export const Recap = () => {
   const apiUrl = BACKEND;
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
-  
-  
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(apiUrl+"/api/product", {
+      const response = await fetch(apiUrl + "/api/product", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -48,17 +45,32 @@ export const Recap = () => {
     setRowid(e.currentTarget.value);
   };
   const [datsa, setData] = useState(null);
+  const [datsaPengeluaran, setDataPengeluaran] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(apiUrl+"/api/transaction/show_transaction");
-        const datsa = await response.json();        
+        const response = await fetch(
+          apiUrl + "/api/transaction/show_transaction"
+        );
+        const datsa = await response.json();
         setData(datsa);
       } catch (error) {
         return <div>Error {error} </div>;
       }
     };
+    const fetchData2 = async () => {
+      try {
+        const response = await fetch(
+          apiUrl + "/api/transaction/show_pengeluaran"
+        );
+        const datsa = await response.json();
+        setDataPengeluaran(datsa);
+      } catch (error) {
+        return <div>Error {error} </div>;
+      }
+    };
     fetchData();
+    fetchData2();
     return;
     // dispatch(getSandwichLists());
   }, []);
@@ -72,8 +84,18 @@ export const Recap = () => {
       </>
     );
   }
+  if (!datsaPengeluaran) {
+    return (
+      <>
+        <div>
+          <h1>Loading ...</h1>
+        </div>
+      </>
+    );
+  }
 
   const datas = datsa.data;
+  const datasPengeluaran = datsaPengeluaran.data;
   function getButtonColor(data) {
     if (data === "rice") {
       return "badge badge-outline-primary";
@@ -89,7 +111,6 @@ export const Recap = () => {
 
   return (
     <>
-     
       <div>
         <div className="page-header">
           <h3 className="page-title"> Rekap </h3>
@@ -127,7 +148,7 @@ export const Recap = () => {
                   </div>
                 </Row>
                 <div className="table-responsive">
-                <DataTable columns={COLUMNSPEMASUKAN} data={datas} />
+                  <DataTable columns={COLUMNSPEMASUKAN} data={datas} />
                 </div>
               </div>
             </div>
@@ -137,7 +158,9 @@ export const Recap = () => {
               <div className="card-body">
                 <Row>
                   <div className="col-lg-6 grid-margin stretch-card">
-                    <h4 className="card-title">Products</h4>
+                    <h4 className="card-title text-danger">
+                      Rekap Pengeluaran
+                    </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
                     <a href="/inventory/create" className="align-items-right">
@@ -155,51 +178,47 @@ export const Recap = () => {
                     <thead>
                       <tr>
                         <th>id</th>
-                        <th>Nama Bill</th>
-                        <th>Terbayar</th>
-                        <th>Waktu Transaksi</th>
-                        <th>Jenis Pembayaran</th>
-                        <th>Total</th>
-                        <th>Uang Masuk</th>
-                        <th>Uang Keluar</th>
+                        <th>Nama Pengeluaran</th>
+                        <th>Jenis Pengeluaran</th>
+                        <th>Waktu Pengeluaran</th>
+                        <th>Harga Pengeluaran</th>
+                        <th>Jumlah Barang</th>
+                        <th>Satuan</th>
+                        <th>Total Pengeluaran</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {datas.map((row, index) => (
-                        <tr key={index}>
-                          <td>{row.Bill.id}</td>
-                          <td>{"Order#"+row.Bill.id}</td>
-                          <td>{row.Bill.paid === "1" ? 'sudah bayar' : 'belum bayar'}</td>
-                          <td>{row.Bill.Timestamp}</td>                          
-                          <td>{row.Bill.jenis_pembayaran}</td>
-                          <td>{row.Bill.total}</td>
-                          <td>{row.Bill.cash_in}</td>
-                          <td>{row.Bill.cash_out}</td>
-                          <td>
-                            <div className="row">
-                              <div className="col-md-6">
-                                <a>
-                                  <button
-                                    className="btn btn-outline-danger"
-                                    value={row.id}
-                                    onClick={handleShow}
-                                  >
-                                    <i className="mdi mdi-delete-forever"></i>
-                                  </button>
-                                </a>
-                              </div>
-                              <div className="col-md-6">
-                                <a>
-                                  <button className="btn btn-outline-info">
-                                    <i className="mdi mdi-table-edit"></i>
-                                  </button>
-                                </a>
-                              </div>
-                            </div>
+                      {datasPengeluaran && datasPengeluaran.length > 0 ? (
+                        datasPengeluaran.map((row, index) => (
+                          <tr
+                            key={index}                          
+                          >
+                            <td>{"Pengeluaran #" + row.id}</td>
+                            <td>{row.nama_pengeluaran}</td>
+                            <td>
+                              <label className="badge badge-warning">
+                                {row.jenis_pengeluaran}
+                              </label>
+                            </td>
+                            <td>{row.waktu_pengeluaran}</td>
+                            <td>{row.harga_pengeluaran}</td>
+                            <td>{row.jumlah_barang}</td>
+                            <td>{row.satuan}</td>
+                            <td>{row.total_pengeluaran}</td>
+                            <td>
+                              <button className="btn btn-danger">Delete</button>
+                              <button className="btn btn-primary">Edit</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="text-center">
+                            Tidak ada pengeluaran yang tersimpan.
                           </td>
                         </tr>
-                      ))}
+                      )}                    
                     </tbody>
                   </table>
                 </div>
@@ -732,7 +751,7 @@ export const Recap = () => {
           <Modal.Title>Modal title</Modal.Title>
         </Modal.Header> */}
         <Modal.Body>
-        <Loading
+          <Loading
             loading={loading}
             // Optional props
             color="orange"
@@ -742,16 +761,15 @@ export const Recap = () => {
             speed="fast"
             // Use your own component, or the 'threeDots' component for the loading screen (default is spinner).
             loadingComponent="threeDots"
-          >
-            </Loading>
+          ></Loading>
 
-            <div className="text-center">
-              <i
-                sty
-                className="icon-lg text-danger mdi mdi-comment-question-outline"
-              ></i>
-            </div>
-            <div className="text-center">Are you sure want to delete ?</div>
+          <div className="text-center">
+            <i
+              sty
+              className="icon-lg text-danger mdi mdi-comment-question-outline"
+            ></i>
+          </div>
+          <div className="text-center">Are you sure want to delete ?</div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={handleDelete}>
