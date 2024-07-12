@@ -4,10 +4,10 @@ import { Modal, ProgressBar } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { BACKEND } from "../../constants";
 
-const ModalDeleteBillPemasukan = ({
+const ModalDeletePengeluaran = ({
   deleteModal,
   handleCloseDeleteModal,
-  billToDelete,
+  pengeluaranToDelete,
   handleShowDeleteModal,
   fetchData,
   fetchAllKeuntungan
@@ -16,15 +16,15 @@ const ModalDeleteBillPemasukan = ({
   const [loadingModal, setLoadingModal] = useState(false);
 
   const handleDeleteBill = async (event) => {
-    console.log(billToDelete);
+    console.log(pengeluaranToDelete);
     setLoadingModal(true); // Show loading modal
 
     const formData = new FormData();
-    formData.append("id", billToDelete);
+    formData.append("id", pengeluaranToDelete);
 
     try {
       const response = await axios.post(
-        `${apiUrl}/api/transaction/delete_bill`,
+        `${apiUrl}/api/transaction/delete_pengeluaran`,
         formData,
         {
           headers: {
@@ -40,8 +40,8 @@ const ModalDeleteBillPemasukan = ({
 
       // Optionally, refresh the dataSavedBill list or remove the deleted item from the state
     } catch (error) {
-      console.error("There was an error deleting the bill!", error);
-      handleShowDeleteModal(billToDelete);
+      console.error("There was an error deleting the pengeluaran!", error);
+      handleShowDeleteModal(pengeluaranToDelete);
 
       setLoadingModal(false); // Hide loading modal
     }
@@ -56,7 +56,7 @@ const ModalDeleteBillPemasukan = ({
         keyboard={false}
       >
         <Modal.Body>
-          <h5>Apakah Bill ini ingin didelete?</h5>
+          <h5>Apakah Pengeluaran ini ingin didelete?</h5>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
@@ -84,4 +84,4 @@ const ModalDeleteBillPemasukan = ({
   );
 };
 
-export default ModalDeleteBillPemasukan;
+export default ModalDeletePengeluaran;

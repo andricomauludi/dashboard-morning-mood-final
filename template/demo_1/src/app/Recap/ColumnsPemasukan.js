@@ -8,11 +8,11 @@ export const COLUMNSPEMASUKAN = [
     accessor: 'order',
   },
   {
-    Header: 'Payment Status',
+    Header: 'Status Pembayaran',
     accessor: 'paymentStatus',
   },
   {
-    Header: 'Timestamp',
+    Header: 'Waktu Transaksi',
     accessor: 'timestamp',
   },
   {
@@ -24,15 +24,15 @@ export const COLUMNSPEMASUKAN = [
     accessor: 'total',
   },
   {
-    Header: 'Cash In',
+    Header: 'Uang Masuk',
     accessor: 'cash_in',
   },
   {
-    Header: 'Cash Out',
+    Header: 'Uang Keluar',
     accessor: 'cash_out',
   },
   {
-    Header: 'Actions',
+    Header: 'Aksi',
     accessor: 'actions',
   },
 ];

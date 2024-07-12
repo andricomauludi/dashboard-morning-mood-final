@@ -6,13 +6,25 @@ import { Loading } from "react-loading-wrapper";
 import "react-loading-wrapper/dist/index.css";
 import { BACKEND } from "../../constants/index.js";
 import DataTable from "./DataTablePemasukan.js";
+import DatatablePengeluaran from "./DataTablePengeluaran.js";
 import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
+import { COLUMNSPENGELUARAN } from "./ColumnsPengeluaran.js";
+import ModalCreatePengeluaran from "./ModalCreatePengeluaran.js";
 
 export const Recap = () => {
   const apiUrl = BACKEND;
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  function formatIDR(amount) {
+    const formatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    });
+    return formatter.format(amount);
+  }
 
   const handleDelete = async () => {
     try {
@@ -46,31 +58,98 @@ export const Recap = () => {
   };
   const [datsa, setData] = useState(null);
   const [datsaPengeluaran, setDataPengeluaran] = useState(null);
+  const [datsaPendapatanHarian, setDataPendapatanHarian] = useState(null);
+  const [datsaPengeluaranHarian, setDataPengeluaranHarian] = useState(null);
+  const [datsaKeuntunganHarian, setDataKeuntunganHarian] = useState(null);
+  const [datsaPendapatanBulanan, setDataPendapatanBulanan] = useState(null);
+  const [datsaPengeluaranBulanan, setDataPengeluaranBulanan] = useState(null);
+  const [datsaKeuntunganBulanan, setDataKeuntunganBulanan] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({}); // State to hold modal data
+
+  // Function to handle opening modal and set data
+  const showModalPengeluaran = (rowData) => {
+    setModalData(rowData); // Set modal data based on row data
+    setShowModal(true); // Show modal
+  };
+
+  // Function to handle closing modal
+  const handleCloseModalPengeluaran = () => {
+    setShowModal(false); // Close modal
+    setModalData({}); // Clear modal data
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        apiUrl + "/api/transaction/show_transaction"
+      );
+      const datsa = await response.json();
+      setData(datsa);
+    } catch (error) {
+      return <div>Error {error} </div>;
+    }
+  };
+  const fetchData2 = async () => {
+    try {
+      const response = await fetch(
+        apiUrl + "/api/transaction/show_pengeluaran"
+      );
+      const datsa = await response.json();
+      setDataPengeluaran(datsa);
+    } catch (error) {
+      return <div>Error {error} </div>;
+    }
+  };
+
+  const fetchAllKeuntungan = async () => {
+    try {
+      const responsePemasukanToday = await fetch(
+        apiUrl + "/api/pendapatan/show_pendapatan_harian"
+      );
+      const dataPemasukanToday = await responsePemasukanToday.json();
+      setDataPendapatanHarian(dataPemasukanToday.total_today);
+  
+      const responsePemasukanMonth = await fetch(
+        apiUrl + "/api/pendapatan/show_pendapatan_bulanan"
+      );
+      const dataPemasukanMonth = await responsePemasukanMonth.json();
+      setDataPendapatanBulanan(dataPemasukanMonth.total_current_month);
+  
+      const responsePengeluaranToday = await fetch(
+        apiUrl + "/api/pendapatan/show_pengeluaran_harian"
+      );
+      const dataPengeluaranToday = await responsePengeluaranToday.json();
+      setDataPengeluaranHarian(dataPengeluaranToday.total_pengeluaran_today);
+  
+      const responsePengeluaranMonth = await fetch(
+        apiUrl + "/api/pendapatan/show_pengeluaran_bulanan"
+      );
+      const dataPengeluaranMonth = await responsePengeluaranMonth.json();
+      setDataPengeluaranBulanan(dataPengeluaranMonth.total_pengeluaran_current_month);
+  
+      const responseKeuntunganToday = await fetch(
+        apiUrl + "/api/pendapatan/show_keuntungan_harian"
+      );
+      const dataKeuntunganToday = await responseKeuntunganToday.json();
+      setDataKeuntunganHarian(dataKeuntunganToday.total_keuntungan_bersih_current_day);
+  
+      const responseKeuntunganMonth = await fetch(
+        apiUrl + "/api/pendapatan/show_keuntungan_bulanan"
+      );
+      const dataKeuntunganMonth = await responseKeuntunganMonth.json();
+      setDataKeuntunganBulanan(dataKeuntunganMonth.total_keuntungan_bersih_current_month);
+  
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Handle errors as needed
+    }
+  };
+  
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          apiUrl + "/api/transaction/show_transaction"
-        );
-        const datsa = await response.json();
-        setData(datsa);
-      } catch (error) {
-        return <div>Error {error} </div>;
-      }
-    };
-    const fetchData2 = async () => {
-      try {
-        const response = await fetch(
-          apiUrl + "/api/transaction/show_pengeluaran"
-        );
-        const datsa = await response.json();
-        setDataPengeluaran(datsa);
-      } catch (error) {
-        return <div>Error {error} </div>;
-      }
-    };
     fetchData();
     fetchData2();
+    fetchAllKeuntungan();
     return;
     // dispatch(getSandwichLists());
   }, []);
@@ -126,6 +205,211 @@ export const Recap = () => {
           </nav>
         </div>
         <div className="row">
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                background: "linear-gradient(135deg, #39ff14, #f5e71f)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0 text-dark">
+                        {formatIDR(datsaPendapatanHarian)}
+                      </h3>
+                      {/* <p className="text-success ml-2 mb-0 font-weight-medium">
+                        +3.5%
+                      </p> */}
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span className="mdi mdi-cash-usd icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="text-dark font-weight-normal">
+                  Pemasukan Hari Ini
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                background: "linear-gradient(to right, #ff0000, #ff7373)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0">
+                        {formatIDR(datsaPengeluaranHarian)}
+                      </h3>
+                      {/* <p className="text-success ml-2 mb-0 font-weight-medium">
+                        +11%
+                      </p> */}
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span className="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="text-white font-weight-normal">
+                  Pengeluaran Hari ini
+                </h6>
+              </div>
+            </div>
+          </div>
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                background: "linear-gradient(135deg, #8a2be2, #ffffff)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0" style={{ color: "yellow" }}>
+                        {formatIDR(datsaKeuntunganHarian)}
+                      </h3>
+                      {/* <p
+                        className="text-danger ml-2 mb-0 font-weight-medium"
+                        style={{ color: "#39ff14" }}
+                      >
+                        -2.4%
+                      </p> */}
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span
+                        className="mdi mdi-cash-multiple icon-item"
+                        style={{ color: "yellow" }}
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="font-weight-normal" style={{ color: "white" }}>
+                  Pendapatan Bersih Hari ini
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                backgroundImage: "linear-gradient(to right, #000000, #39ff14)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0" style={{ color: "#39ff14" }}>
+                        {formatIDR(datsaPendapatanBulanan)}
+                      </h3>
+                      {/* <p
+                        className="text-success ml-2 mb-0 font-weight-medium"
+                        style={{ color: "#39ff14" }}
+                      >
+                        +3.5%
+                      </p> */}
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span className="mdi mdi-cash-usd icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="text-white font-weight-normal">
+                  Pemasukan Bulan Ini
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                backgroundImage: "linear-gradient(to right, #000000, #ff0000)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0" style={{ color: "#ff0000" }}>
+                        {formatIDR(datsaPengeluaranBulanan)}
+                      </h3>
+                      {/* <p
+                        className="text-success ml-2 mb-0 font-weight-medium"
+                        style={{ color: "#ff0000" }}
+                      >
+                        +11%
+                      </p> */}
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span className="mdi mdi-arrow-top-right icon-item"></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="text-white font-weight-normal">
+                  Pengeluaran Bulan ini
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <div
+              className="card"
+              style={{
+                backgroundImage: "linear-gradient(to right, #000000, #8a2be2)",
+              }}
+            >
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-9">
+                    <div className="d-flex align-items-center align-self-start">
+                      <h3 className="mb-0" style={{ color: "yellow" }}>
+                        {formatIDR(datsaKeuntunganBulanan)}
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="col-3">
+                    <div className="icon icon-box-dark">
+                      <span
+                        className="mdi mdi-cash-multiple icon-item"
+                        style={{ color: "yellow" }}
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+                <h6 className="text-white font-weight-normal">
+                  Pendapatan Bersih Bulan ini
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row">
           <div className="col-lg-12 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
@@ -136,7 +420,7 @@ export const Recap = () => {
                     <h4 className="card-title text-success">Rekap Pemasukan</h4>
                     {/* </label> */}
                   </div>
-                  <div className="col-lg-6 mr-auto text-sm-right ">
+                  {/* <div className="col-lg-6 mr-auto text-sm-right ">
                     <a href="/inventory/create" className="align-items-right">
                       <button className="btn btn-outline-warning">
                         <span>
@@ -145,10 +429,15 @@ export const Recap = () => {
                         Create Pemasukan
                       </button>
                     </a>
-                  </div>
+                  </div> */}
                 </Row>
                 <div className="table-responsive">
-                  <DataTable columns={COLUMNSPEMASUKAN} data={datas} />
+                  <DataTable
+                    columns={COLUMNSPEMASUKAN}
+                    data={datas}
+                    fetchData={fetchData}
+                    fetchAllKeuntungan={fetchAllKeuntungan}
+                  />
                 </div>
               </div>
             </div>
@@ -163,578 +452,24 @@ export const Recap = () => {
                     </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
-                    <a href="/inventory/create" className="align-items-right">
-                      <button className="btn btn-outline-warning">
-                        <span>
-                          <i className="mdi mdi-plus"></i>
-                        </span>
-                        Create Product
-                      </button>
-                    </a>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => showModalPengeluaran()}
+                    >
+                      <span>
+                        <i className="mdi mdi-plus"></i>
+                      </span>
+                      Create Pengeluaran
+                    </button>
                   </div>
                 </Row>
                 <div className="table-responsive">
-                  <table className="table table-dark table-hover">
-                    <thead>
-                      <tr>
-                        <th>id</th>
-                        <th>Nama Pengeluaran</th>
-                        <th>Jenis Pengeluaran</th>
-                        <th>Waktu Pengeluaran</th>
-                        <th>Harga Pengeluaran</th>
-                        <th>Jumlah Barang</th>
-                        <th>Satuan</th>
-                        <th>Total Pengeluaran</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {datasPengeluaran && datasPengeluaran.length > 0 ? (
-                        datasPengeluaran.map((row, index) => (
-                          <tr
-                            key={index}                          
-                          >
-                            <td>{"Pengeluaran #" + row.id}</td>
-                            <td>{row.nama_pengeluaran}</td>
-                            <td>
-                              <label className="badge badge-warning">
-                                {row.jenis_pengeluaran}
-                              </label>
-                            </td>
-                            <td>{row.waktu_pengeluaran}</td>
-                            <td>{row.harga_pengeluaran}</td>
-                            <td>{row.jumlah_barang}</td>
-                            <td>{row.satuan}</td>
-                            <td>{row.total_pengeluaran}</td>
-                            <td>
-                              <button className="btn btn-danger">Delete</button>
-                              <button className="btn btn-primary">Edit</button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="4" className="text-center">
-                            Tidak ada pengeluaran yang tersimpan.
-                          </td>
-                        </tr>
-                      )}                    
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Transactions</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-hover</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>User</th>
-                        <th>Product</th>
-                        <th>Sale</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Jacob</td>
-                        <td>Photoshop</td>
-                        <td className="text-danger">
-                          {" "}
-                          28.76% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-danger">Pending</label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Messsy</td>
-                        <td>Flash</td>
-                        <td className="text-danger">
-                          {" "}
-                          21.06% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-warning">
-                            In progress
-                          </label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>John</td>
-                        <td>Premier</td>
-                        <td className="text-danger">
-                          {" "}
-                          35.00% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-info">Fixed</label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Peter</td>
-                        <td>After effects</td>
-                        <td className="text-success">
-                          {" "}
-                          82.00% <i className="mdi mdi-arrow-up"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-success">
-                            Completed
-                          </label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Dave</td>
-                        <td>53275535</td>
-                        <td className="text-success">
-                          {" "}
-                          98.05% <i className="mdi mdi-arrow-up"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-warning">
-                            In progress
-                          </label>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-lg-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Transaction</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-hover</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>User</th>
-                        <th>Product</th>
-                        <th>Sale</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Jacob</td>
-                        <td>Photoshop</td>
-                        <td className="text-danger">
-                          {" "}
-                          28.76% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-danger">Pending</label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Messsy</td>
-                        <td>Flash</td>
-                        <td className="text-danger">
-                          {" "}
-                          21.06% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-warning">
-                            In progress
-                          </label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>John</td>
-                        <td>Premier</td>
-                        <td className="text-danger">
-                          {" "}
-                          35.00% <i className="mdi mdi-arrow-down"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-info">Fixed</label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Peter</td>
-                        <td>After effects</td>
-                        <td className="text-success">
-                          {" "}
-                          82.00% <i className="mdi mdi-arrow-up"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-success">
-                            Completed
-                          </label>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Dave</td>
-                        <td>53275535</td>
-                        <td className="text-success">
-                          {" "}
-                          98.05% <i className="mdi mdi-arrow-up"></i>
-                        </td>
-                        <td>
-                          <label className="badge badge-warning">
-                            In progress
-                          </label>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Striped Table</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-striped</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th> User </th>
-                        <th> First name </th>
-                        <th> Progress </th>
-                        <th> Amount </th>
-                        <th> Deadline </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face1.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> Herman Beck </td>
-                        <td>
-                          <ProgressBar variant="success" now={25} />
-                        </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face2.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> Messsy Adam </td>
-                        <td>
-                          <ProgressBar variant="danger" now={75} />
-                        </td>
-                        <td> $245.30 </td>
-                        <td> July 1, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face3.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> John Richards </td>
-                        <td>
-                          <ProgressBar variant="warning" now={90} />
-                        </td>
-                        <td> $138.00 </td>
-                        <td> Apr 12, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face4.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> Peter Meggik </td>
-                        <td>
-                          <ProgressBar variant="primary" now={50} />
-                        </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face5.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> Edward </td>
-                        <td>
-                          <ProgressBar variant="danger" now={60} />
-                        </td>
-                        <td> $ 160.25 </td>
-                        <td> May 03, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face6.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> John Doe </td>
-                        <td>
-                          <ProgressBar variant="info" now={65} />
-                        </td>
-                        <td> $ 123.21 </td>
-                        <td> April 05, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td className="py-1">
-                          <img
-                            src={require("../../assets/images/faces/face7.jpg")}
-                            alt="user icon"
-                          />
-                        </td>
-                        <td> Henry Tom </td>
-                        <td>
-                          <ProgressBar variant="warning" now={20} />
-                        </td>
-                        <td> $ 150.00 </td>
-                        <td> June 16, 2015 </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Bordered table</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-bordered</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th> # </th>
-                        <th> First name </th>
-                        <th> Progress </th>
-                        <th> Amount </th>
-                        <th> Deadline </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td> 1 </td>
-                        <td> Herman Beck </td>
-                        <td>
-                          <ProgressBar variant="success" now={25} />
-                        </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 2 </td>
-                        <td> Messsy Adam </td>
-                        <td>
-                          <ProgressBar variant="danger" now={75} />
-                        </td>
-                        <td> $245.30 </td>
-                        <td> July 1, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 3 </td>
-                        <td> John Richards </td>
-                        <td>
-                          <ProgressBar variant="warning" now={90} />
-                        </td>
-                        <td> $138.00 </td>
-                        <td> Apr 12, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 4 </td>
-                        <td> Peter Meggik </td>
-                        <td>
-                          <ProgressBar variant="primary" now={50} />
-                        </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 5 </td>
-                        <td> Edward </td>
-                        <td>
-                          <ProgressBar variant="danger" now={35} />
-                        </td>
-                        <td> $ 160.25 </td>
-                        <td> May 03, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 6 </td>
-                        <td> John Doe </td>
-                        <td>
-                          <ProgressBar variant="info" now={65} />
-                        </td>
-                        <td> $ 123.21 </td>
-                        <td> April 05, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 7 </td>
-                        <td> Henry Tom </td>
-                        <td>
-                          <ProgressBar variant="warning" now={20} />
-                        </td>
-                        <td> $ 150.00 </td>
-                        <td> June 16, 2015 </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-12 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Inverse table</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-dark</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-dark">
-                    <thead>
-                      <tr>
-                        <th> # </th>
-                        <th> First name </th>
-                        <th> Amount </th>
-                        <th> Deadline </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td> 1 </td>
-                        <td> Herman Beck </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 2 </td>
-                        <td> Messsy Adam </td>
-                        <td> $245.30 </td>
-                        <td> July 1, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 3 </td>
-                        <td> John Richards </td>
-                        <td> $138.00 </td>
-                        <td> Apr 12, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 4 </td>
-                        <td> Peter Meggik </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 5 </td>
-                        <td> Edward </td>
-                        <td> $ 160.25 </td>
-                        <td> May 03, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 6 </td>
-                        <td> John Doe </td>
-                        <td> $ 123.21 </td>
-                        <td> April 05, 2015 </td>
-                      </tr>
-                      <tr>
-                        <td> 7 </td>
-                        <td> Henry Tom </td>
-                        <td> $ 150.00 </td>
-                        <td> June 16, 2015 </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-12 stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <h4 className="card-title">Table with contextual classNames</h4>
-                <p className="card-description">
-                  {" "}
-                  Add className <code>.table-&#123;color&#125;</code>
-                </p>
-                <div className="table-responsive">
-                  <table className="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th> # </th>
-                        <th> First name </th>
-                        <th> Product </th>
-                        <th> Amount </th>
-                        <th> Deadline </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="table-info">
-                        <td> 1 </td>
-                        <td> Herman Beck </td>
-                        <td> Photoshop </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr className="table-warning">
-                        <td> 2 </td>
-                        <td> Messsy Adam </td>
-                        <td> Flash </td>
-                        <td> $245.30 </td>
-                        <td> July 1, 2015 </td>
-                      </tr>
-                      <tr className="table-danger">
-                        <td> 3 </td>
-                        <td> John Richards </td>
-                        <td> Premeire </td>
-                        <td> $138.00 </td>
-                        <td> Apr 12, 2015 </td>
-                      </tr>
-                      <tr className="table-success">
-                        <td> 4 </td>
-                        <td> Peter Meggik </td>
-                        <td> After effects </td>
-                        <td> $ 77.99 </td>
-                        <td> May 15, 2015 </td>
-                      </tr>
-                      <tr className="table-primary">
-                        <td> 5 </td>
-                        <td> Edward </td>
-                        <td> Illustrator </td>
-                        <td> $ 160.25 </td>
-                        <td> May 03, 2015 </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <DatatablePengeluaran
+                    columns={COLUMNSPENGELUARAN}
+                    data={datasPengeluaran}
+                    fetchData={fetchData2}
+                    fetchAllKeuntungan={fetchAllKeuntungan}
+                  />
                 </div>
               </div>
             </div>
@@ -780,6 +515,13 @@ export const Recap = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ModalCreatePengeluaran
+        show={showModal}
+        fetchData={fetchData2}
+        handleShow={showModalPengeluaran}
+        handleClose={handleCloseModalPengeluaran}
+        fetchAllKeuntungan={fetchAllKeuntungan}
+      />
     </>
   );
 };

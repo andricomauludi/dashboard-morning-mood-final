@@ -6,12 +6,31 @@ import {
   useSortBy,
 } from "react-table";
 import AccordionDetailBill from "./DetailBill";
-import ModalDeleteBillPemasukan from "./ModalDeleteBillPemasukan";
+import { Button, Modal, ProgressBar } from "react-bootstrap";
+import ModalDeletePengeluaran from "./ModalDeletePengeluaran";
+import { BACKEND } from "../../constants";
+import axios from "axios";
+import ModalEditPengeluaran from "./ModalEditPengeluaran";
 
-const Table = ({ columns, data }) => {
+const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) => {
+  const apiUrl = BACKEND;
+
   const [searchInput, setSearchInput] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
-  const [billToDelete, setBillToDelete] = useState("");
+  const [loadingModal, setLoadingModal] = useState(false);
+
+  const [editModal, setEditModal] = useState(false);
+  const [pengeluaranToDelete, setPengeluaranToDelete] = useState("");
+  const [pengeluaranToEdit, setPengeluaranToEdit] = useState({
+    id: "",
+    nama_pengeuaran: "",
+    jenis_pengeluaran: "",
+    WaktuPengeluaran: "",
+    harga_pengeluaran: 0,
+    jumlah_barang: 0,
+    satuan: "",
+    total_pengeluaran: 0,  
+  });
 
   const today = new Date();
   const [selectedYear, setSelectedYear] = useState(
@@ -35,7 +54,12 @@ const Table = ({ columns, data }) => {
 
   const handleShowDeleteModal = (billId) => {
     setDeleteModal(true);
-    setBillToDelete(billId);
+    setPengeluaranToDelete(billId);
+  };
+
+  const handleShowEditModal = (bill) => {
+    setEditModal(true);
+    setPengeluaranToEdit(bill);
   };
 
   const handleYearChange = (e) => {
@@ -48,6 +72,50 @@ const Table = ({ columns, data }) => {
 
   const handleDayChange = (e) => {
     setSelectedDay(e.target.value);
+  };
+  const handleCloseEditModal = () => {
+    setEditModal(false);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setPengeluaranToEdit((prevState) => ({
+      ...prevState,
+      [name]:
+        name === "harga_pengeluaran" ||
+        name === "jumlah_barang" ||
+        name === "total_pengeluaran"
+          ? parseInt(value, 10)
+          : value,
+    }));
+  };
+
+  const handleEditSave = () => {
+    setLoadingModal(true);
+    const fetchDataEdit = async () => {
+      try {        
+        const response = await axios.put(
+          apiUrl + `/api/transaction/edit_pengeluaran/${pengeluaranToEdit.id}`,
+          pengeluaranToEdit,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setLoadingModal(false);
+        setEditModal(false);
+        fetchData(); // Reload the data after save
+        fetchAllKeuntungan()
+        // Optionally, update the table data here if needed
+      } catch (error) {
+        console.error("Error saving edited bill:", error);
+        setLoadingModal(false);
+        setEditModal(false);
+      }
+    };
+    fetchDataEdit();
+    setEditModal(false);
   };
 
   const updateDaysInMonth = (year, month) => {
@@ -88,7 +156,7 @@ const Table = ({ columns, data }) => {
     if (!selectedYear && !selectedMonth && !selectedDay) return data;
 
     return data.filter((row) => {
-      const date = new Date(row.Bill.Timestamp);
+      const date = new Date(row.WaktuPengeluaran);
       const year = date.getFullYear().toString();
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const day = date.getDate().toString().padStart(2, "0");
@@ -105,13 +173,12 @@ const Table = ({ columns, data }) => {
   const transformedData = useMemo(
     () =>
       filteredData.map((row) => ({
-        ...row,
-        order: `Order#${row.Bill.id}`,
-        timestamp: `${formatDate(row.Bill.Timestamp)}`,
-        total: `${formatPrice(row.Bill.total)}`,
-        cash_in: `${formatPrice(row.Bill.cash_in)}`,
-        cash_out: `${formatPrice(row.Bill.cash_out)}`,
-        paymentStatus: row.Bill.paid === "1" ? "sudah bayar" : "belum bayar",
+        ...row,        
+        waktuPengeluaran: `${formatDate(row.WaktuPengeluaran)}`,        
+        hargaPengeluaran: `${formatPrice(row.harga_pengeluaran)}`,
+        totalPengeluaran: `${formatPrice(row.total_pengeluaran)}`,
+        // jenisPengeluaran: row.jenis_pengeluaran === "1" ? "sudah bayar" : "belum bayar",
+        // jenisPengeluaran: row.jenis_pengeluaran === "1" ? "sudah bayar" : "belum bayar",
         actions: (
           <div className="row">
             <div className="col-md-6">
@@ -119,7 +186,7 @@ const Table = ({ columns, data }) => {
                 <button
                   className="btn btn-outline-danger"
                   value={row.id}
-                  onClick={() => handleShowDeleteModal(row.Bill.id)}
+                  onClick={() => handleShowDeleteModal(row.id)}
                 >
                   <i className="mdi mdi-delete-forever"></i>
                 </button>
@@ -127,12 +194,24 @@ const Table = ({ columns, data }) => {
             </div>
             <div className="col-md-6">
               <a>
-                <button
+                {console.log(row)}
+              <button
                   className="btn btn-outline-info"
-                  onClick={() => handleEdit(row.Bill.id)}
+                  onClick={() =>
+                    handleShowEditModal({
+                      id: row.id,
+                      nama_pengeluaran: row.nama_pengeluaran,
+                      jenis_pengeluaran: row.jenis_pengeluaran,
+                      WaktuPengeluaran: row.WaktuPengeluaran,
+                      harga_pengeluaran: row.harga_pengeluaran,
+                      jumlah_barang: row.jumlah_barang,
+                      satuan: row.satuan,
+                      total_pengeluaran: row.total_pengeluaran,                    
+                    })
+                  }
                 >
                   <i className="mdi mdi-table-edit"></i>
-                </button>
+                </button>              
               </a>
             </div>
           </div>
@@ -333,6 +412,9 @@ const Table = ({ columns, data }) => {
             </strong>
           </span>
         </div>
+        <div className="row mt-3 mb-3 d-flex justify-content-center">
+          <Button onClick={fetchData}>Memuat ulang data</Button>
+        </div>
       </div>
       <table className="table table-dark table-hover" {...getTableProps()}>
         <thead>
@@ -376,63 +458,47 @@ const Table = ({ columns, data }) => {
               <React.Fragment key={row.id}>
                 <tr {...row.getRowProps()}>
                   {row.cells.map((cell) => {
-                    if (cell.column.id === "paymentStatus") {
-                      return (
-                        <td {...cell.getCellProps()}>
-                          <span
-                            className={`badge ${
-                              cell.value === "sudah bayar"
-                                ? "badge-success"
-                                : "badge-danger"
-                            }`}
-                          >
-                            {cell.render("Cell")}
-                          </span>
-                        </td>
-                      );
-                    }
-                    if (cell.column.id === "cash_in") {
-                      return (
-                        <td {...cell.getCellProps()}>
-                          <span className={`badge badge-warning`}>
-                            {cell.render("Cell")}
-                          </span>
-                        </td>
-                      );
-                    }
-                    if (cell.column.id === "cash_out") {
-                      return (
-                        <td {...cell.getCellProps()}>
-                          <span className={`badge badge-info`}>
-                            {cell.render("Cell")}
-                          </span>
-                        </td>
-                      );
-                    }
+                 
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
                     );
                   })}
-                </tr>
-                <tr>
-                  <td colSpan="9">
-                    <AccordionDetailBill
-                      billDetails={row.original.Detail_bill}
-                    />
-                  </td>
-                </tr>
+                </tr>               
               </React.Fragment>
             );
           })}
         </tbody>
       </table>
-      <ModalDeleteBillPemasukan
+      <ModalDeletePengeluaran
         deleteModal={deleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}
-        billToDelete={billToDelete}
+        handleShowDeleteModal={handleShowDeleteModal}
+        pengeluaranToDelete={pengeluaranToDelete}
+        fetchData={fetchData}
+        fetchAllKeuntungan={fetchAllKeuntungan}
       />
+        <ModalEditPengeluaran
+        show={editModal}
+        handleClose={handleCloseEditModal}
+        bill={pengeluaranToEdit}
+        handleSave={handleEditSave}
+        handleChange={handleEditChange}
+      />
+       <Modal
+        show={loadingModal}
+        onHide={() => {}}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <div className="text-center">
+            <p>Saving...</p>
+            <ProgressBar animated now={100} />
+          </div>
+        </Modal.Body>
+      </Modal>    
     </>
   );
 };
 
-export default Table;
+export default DatatablePengeluaran;

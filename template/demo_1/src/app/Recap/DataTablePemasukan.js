@@ -7,11 +7,29 @@ import {
 } from "react-table";
 import AccordionDetailBill from "./DetailBill";
 import ModalDeleteBillPemasukan from "./ModalDeleteBillPemasukan";
+import ModalEditBillPemasukan from "./ModalEditBillPemasukan";
+import axios from "axios";
+import { BACKEND } from "../../constants";
+import { Button, Modal, ProgressBar } from "react-bootstrap";
 
-const Table = ({ columns, data }) => {
+const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
+  const apiUrl = BACKEND;
   const [searchInput, setSearchInput] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
   const [billToDelete, setBillToDelete] = useState("");
+  const [editModal, setEditModal] = useState(false);
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [billToEdit, setBillToEdit] = useState({
+    nama_bill: "",
+    paid: "",
+    timestamp: "",
+    jenis_pembayaran: "",
+    total: 0,
+    cash_in: 0,
+    cash_out: 0,
+    id_klien: 0,
+    nama_klien: "",
+  });
 
   const today = new Date();
   const [selectedYear, setSelectedYear] = useState(
@@ -36,6 +54,63 @@ const Table = ({ columns, data }) => {
   const handleShowDeleteModal = (billId) => {
     setDeleteModal(true);
     setBillToDelete(billId);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModal(false);
+  };
+
+  const handleShowEditModal = (bill) => {
+    setEditModal(true);
+    setBillToEdit(bill);
+  };
+  // const handleEditChange = (field, value) => {
+  //   setBillToEdit((prevBill) => ({
+  //     ...prevBill,
+  //     [field]: value,
+  //   }));
+  // };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setBillToEdit((prevState) => ({
+      ...prevState,
+      [name]:
+        name === "total" ||
+        name === "cash_in" ||
+        name === "cash_out" ||
+        name === "id_klien"
+          ? parseInt(value, 10)
+          : value,
+    }));
+  };
+
+  const handleEditSave = () => {
+    setLoadingModal(true);
+    const fetchDataEdit = async () => {
+      try {        
+        const response = await axios.put(
+          apiUrl + `/api/transaction/edit_bill/${billToEdit.id}`,
+          billToEdit,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setLoadingModal(false);
+        setEditModal(false);
+        fetchData(); // Reload the data after save
+        fetchAllKeuntungan(); // Reload the data after save
+        // Optionally, update the table data here if needed
+      } catch (error) {
+        console.error("Error saving edited bill:", error);
+        setLoadingModal(false);
+        setEditModal(false);
+      }
+    };
+    fetchDataEdit();
+    setEditModal(false);
   };
 
   const handleYearChange = (e) => {
@@ -129,7 +204,20 @@ const Table = ({ columns, data }) => {
               <a>
                 <button
                   className="btn btn-outline-info"
-                  onClick={() => handleEdit(row.Bill.id)}
+                  onClick={() =>
+                    handleShowEditModal({
+                      id: row.Bill.id,
+                      nama_bill: row.Bill.nama_bill,
+                      paid: row.Bill.paid,
+                      timestamp: row.Bill.Timestamp,
+                      jenis_pembayaran: row.Bill.jenis_pembayaran,
+                      total: row.Bill.total,
+                      cash_in: row.Bill.cash_in,
+                      cash_out: row.Bill.cash_out,
+                      id_klien: row.Bill.id_klien,
+                      nama_klien: row.Bill.nama_klien,
+                    })
+                  }
                 >
                   <i className="mdi mdi-table-edit"></i>
                 </button>
@@ -173,15 +261,6 @@ const Table = ({ columns, data }) => {
     setSearchInput(value);
     setGlobalFilter(value);
   };
-
-  const handleDelete = (id) => {
-    console.log("Delete ID:", id);
-  };
-
-  const handleEdit = (id) => {
-    console.log("Edit ID:", id);
-  };
-
   if (!data)
     return (
       <>
@@ -261,7 +340,7 @@ const Table = ({ columns, data }) => {
               <div className="col-md-6">
                 <div className="row form-inline">
                   <span>
-                    Go to page:{" "}
+                    Go to :{" "}
                     <input
                       className="form-control"
                       type="number"
@@ -327,11 +406,15 @@ const Table = ({ columns, data }) => {
         </div>
         <div className="row mt-3 mb-3 d-flex justify-content-center">
           <span>
-            Page
+            Halaman ke
             <strong style={{ marginLeft: "5px" }}>
-              {pageIndex + 1} of {pageOptions.length}
+              {pageIndex + 1} dari {pageOptions.length} 
             </strong>
+            &nbsp;Halaman
           </span>
+        </div>
+        <div className="row mt-3 mb-3 d-flex justify-content-center">
+          <Button onClick={fetchData}>Memuat ulang data</Button>
         </div>
       </div>
       <table className="table table-dark table-hover" {...getTableProps()}>
@@ -418,6 +501,8 @@ const Table = ({ columns, data }) => {
                   <td colSpan="9">
                     <AccordionDetailBill
                       billDetails={row.original.Detail_bill}
+                      fetchData={fetchData}
+                      fetchAllKeuntungan={fetchAllKeuntungan}
                     />
                   </td>
                 </tr>
@@ -429,8 +514,32 @@ const Table = ({ columns, data }) => {
       <ModalDeleteBillPemasukan
         deleteModal={deleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}
+        handleShowDeleteModal={handleShowDeleteModal}
         billToDelete={billToDelete}
+        fetchData={fetchData}
+        fetchAllKeuntungan={fetchAllKeuntungan}
       />
+
+      <ModalEditBillPemasukan
+        show={editModal}
+        handleClose={handleCloseEditModal}
+        bill={billToEdit}
+        handleSave={handleEditSave}
+        handleChange={handleEditChange}
+      />
+      <Modal
+        show={loadingModal}
+        onHide={() => {}}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Body>
+          <div className="text-center">
+            <p>Saving...</p>
+            <ProgressBar animated now={100} />
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
