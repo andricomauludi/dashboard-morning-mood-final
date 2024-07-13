@@ -128,10 +128,16 @@ class Sidebar extends Component {
               <span className="menu-title"><Trans>Inventory</Trans></span>
             </Link>
           </li> */}
-          <li className={ this.isPathActive('/Recap') ? 'nav-item menu-items active' : 'nav-item menu-items' }>
+          <li className={ this.isPathActive('/Recap/') ? 'nav-item menu-items active' : 'nav-item menu-items' }>
             <Link className="nav-link" to="/Recap/show">
               <span className="menu-icon"><i className="mdi mdi-library-books"></i></span>
-              <span className="menu-title"><Trans>Rekap</Trans></span>
+              <span className="menu-title"><Trans>Rekap Ceu Monny</Trans></span>
+            </Link>
+          </li>
+          <li className={ this.isPathActive('/Recap-CVJ/') ? 'nav-item menu-items active' : 'nav-item menu-items' }>
+            <Link className="nav-link" to="/Recap-CVJ/show">
+              <span className="menu-icon"><i className="mdi mdi-content-cut"></i></span>
+              <span className="menu-title"><Trans>Rekap CVJ</Trans></span>
             </Link>
           </li>
           <li className={ this.isPathActive('/pos') ? 'nav-item menu-items active' : 'nav-item menu-items' }>

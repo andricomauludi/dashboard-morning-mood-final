@@ -7,6 +7,7 @@ import CreateInventory from './Inventory/CreateInventory';
 import PointOfSales from './point-of-sales/PointOfSales';
 import Recap from './Recap/Recap';
 import CreateRecap from './Recap/CreateRecap';
+import RecapCvj from './Recap-CVJ/RecapCvj';
 
 
 const Dashboard = lazy(() => import('./dashboard/Dashboard'));
@@ -41,6 +42,9 @@ class AppRoutes extends Component {
 
           <Route path="/recap/show" component={Recap  } />
           <Route path="/recap/create" component={ CreateRecap } />
+
+          <Route path="/recap-CVJ/show" component={RecapCvj  } />
+          <Route path="/recap-CVJ/create" component={ CreateRecap } />
 
           <Route path="/pos" component={ PointOfSales } />
 

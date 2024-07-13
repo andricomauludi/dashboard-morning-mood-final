@@ -16,7 +16,7 @@ const ModalCreatePengeluaran = ({ show, handleClose, fetchData, fetchAllKeuntung
     jumlah_barang: 0,
     satuan: "",
     total_pengeluaran: 0,
-    tipe: 0,
+    tipe: 1,
   };
   const [formData, setFormData] = useState(initialFormData);
 

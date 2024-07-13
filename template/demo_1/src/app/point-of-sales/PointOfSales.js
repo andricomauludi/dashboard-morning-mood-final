@@ -25,6 +25,10 @@ export const PointOfSales = () => {
   const [doneModal, setDoneModal] = useState(false);
   const [billToDelete, setBillToDelete] = useState(null); // State to keep track of the bill to delete
 
+  const handleButtonClick = (value) => {
+    setSelectedTipe(value);
+  };
+
   const handleClose = () => setShow(false);
   const handleClose2 = () => setDoneModal(false);
   const handleCloseSaveBill = () => setSaveBillModal(false);
@@ -42,7 +46,7 @@ export const PointOfSales = () => {
     const fetchData4 = async () => {
       try {
         const { data } = await axios.get(
-          apiUrl+"/api/transaction/show_saved_bill"
+          apiUrl + "/api/transaction/show_saved_bill"
         ); //ngambil api dari transaction
         setSavedBill(data.data);
         // console.log(data.data)
@@ -56,7 +60,7 @@ export const PointOfSales = () => {
     setSaveBillModal(true);
   };
   const handleShow = (e) => {
-    console.log(selectedImages)
+    console.log(selectedImages);
     setShow(true);
     setRowid(e.currentTarget.value);
   };
@@ -72,6 +76,7 @@ export const PointOfSales = () => {
   const [cashPaid, setCashPaid] = useState("");
   const [cashPaidDisplay, setCashPaidDisplay] = useState("");
   const [selectedPayment, setSelectedPayment] = useState("");
+  const [selectedTipe, setSelectedTipe] = useState("");
 
   const handlePaymentChange = (event) => {
     const paymentType = event.target.value;
@@ -115,7 +120,13 @@ export const PointOfSales = () => {
   const handleCountChange = (id, newCount) => {
     setSelectedImages((prevState) =>
       prevState.map((img) =>
-        img.id === id ? { ...img, jumlah: parseInt(newCount) || 0, total_harga: parseInt(newCount)*img.harga } : img
+        img.id === id
+          ? {
+              ...img,
+              jumlah: parseInt(newCount) || 0,
+              total_harga: parseInt(newCount) * img.harga,
+            }
+          : img
       )
     );
   };
@@ -164,7 +175,7 @@ export const PointOfSales = () => {
     setCurrentBillId(billId);
     try {
       const response = await fetch(
-        apiUrl+`/api/transaction/show_detail_bill/${billId}`
+        apiUrl + `/api/transaction/show_detail_bill/${billId}`
       );
       const data = await response.json();
       console.log(data.data);
@@ -189,6 +200,7 @@ export const PointOfSales = () => {
     formData.append("cash_in", cashPaid);
     formData.append("cash_out", calculateChange());
     formData.append("paid", 1);
+    formData.append("tipe", selectedTipe);
 
     const modifiedSelectedImages = selectedImages.map(
       ({ id, ...rest }) => rest
@@ -197,7 +209,7 @@ export const PointOfSales = () => {
     try {
       // API call for bill
       const billResponse = await axios.post(
-        apiUrl+"/api/transaction/create_bill",
+        apiUrl + "/api/transaction/create_bill",
         formData,
         {
           headers: {
@@ -217,7 +229,7 @@ export const PointOfSales = () => {
 
       // API call for detail_bill
       const detailBillResponse = await axios.post(
-        apiUrl+"/api/transaction/create_detail_bill_json",
+        apiUrl + "/api/transaction/create_detail_bill_json",
         modifiedSelectedImages2
       );
 
@@ -230,6 +242,7 @@ export const PointOfSales = () => {
       // Clear selectedImages and selectedPayment after sending data
       setSelectedImages([]);
       setSelectedPayment("");
+      setSelectedTipe("");
       setCurrentBillId(0);
 
       // Close the modal after successful submission s
@@ -251,7 +264,7 @@ export const PointOfSales = () => {
 
     try {
       const response = await axios.post(
-        apiUrl+`/api/transaction/delete_bill`,
+        apiUrl + `/api/transaction/delete_bill`,
         formData,
         {
           headers: {
@@ -298,7 +311,7 @@ export const PointOfSales = () => {
     try {
       // API call for bill
       const billResponse = await axios.post(
-        apiUrl+"/api/transaction/create_bill",
+        apiUrl + "/api/transaction/create_bill",
         formData,
         {
           headers: {
@@ -318,7 +331,7 @@ export const PointOfSales = () => {
 
       // API call for detail_bill
       const detailBillResponse = await axios.post(
-        apiUrl+"/api/transaction/create_detail_bill_json",
+        apiUrl + "/api/transaction/create_detail_bill_json",
         modifiedSelectedImages2
       );
 
@@ -380,9 +393,7 @@ export const PointOfSales = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
-          apiUrl+"/api/product/makanan"
-        ); //ngambil api dari auth me
+        const { data } = await axios.get(apiUrl + "/api/product/makanan"); //ngambil api dari auth me
         setDataMakanan(data);
         setLoading(false);
       } catch (e) {
@@ -395,9 +406,7 @@ export const PointOfSales = () => {
     const fetchData2 = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
-          apiUrl+"/api/product/minuman"
-        ); //ngambil api dari auth me
+        const { data } = await axios.get(apiUrl + "/api/product/minuman"); //ngambil api dari auth me
         setDataMinuman(data);
         setLoading(false);
       } catch (e) {
@@ -410,9 +419,7 @@ export const PointOfSales = () => {
     const fetchData3 = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
-          apiUrl+"/api/product/cemilan"
-        ); //ngambil api dari auth me
+        const { data } = await axios.get(apiUrl + "/api/product/cemilan"); //ngambil api dari auth me
         setDataCemilan(data);
         setLoading(false);
       } catch (e) {
@@ -425,9 +432,7 @@ export const PointOfSales = () => {
     const fetchData5 = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
-          apiUrl+"/api/product/barbershop"
-        ); //ngambil api dari auth me
+        const { data } = await axios.get(apiUrl + "/api/product/barbershop"); //ngambil api dari auth me
         setDataBarbershop(data);
         setLoading(false);
       } catch (e) {
@@ -441,7 +446,7 @@ export const PointOfSales = () => {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          apiUrl+"/api/transaction/show_saved_bill"
+          apiUrl + "/api/transaction/show_saved_bill"
         ); //ngambil api dari transaction
         setSavedBill(data.data);
         // console.log(data.data)
@@ -960,6 +965,26 @@ export const PointOfSales = () => {
                 Total Pembayaran {formatPrice(getTotalPrice())}{" "}
               </h3>
               <form onSubmit={handleSubmit} className="forms-sample">
+                <div >
+                  <button
+                  type="button"
+                    className={`btn ${
+                      selectedTipe === "0" ? "btn btn-warning btn-lg mr-5" : "btn btn-outline-secondary btn-lg mr-5"
+                    }`}
+                    onClick={() => handleButtonClick("0")}
+                  >
+                    Kedai Ceu Monny
+                  </button>
+                  <button
+                  type="button"
+                    className={`btn ${
+                      selectedTipe === "1"? "btn btn-warning btn-lg" : "btn btn-outline-secondary btn-lg"
+                    }`}
+                    onClick={() => handleButtonClick("1")}
+                  >
+                    CVJ
+                  </button>
+                </div>
                 <Form.Group>
                   <label className="mt-2" htmlFor="exampleFormControlSelect2">
                     Jenis Pembayaran

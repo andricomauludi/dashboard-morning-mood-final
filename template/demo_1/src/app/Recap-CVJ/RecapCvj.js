@@ -11,7 +11,7 @@ import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
 import { COLUMNSPENGELUARAN } from "./ColumnsPengeluaran.js";
 import ModalCreatePengeluaran from "./ModalCreatePengeluaran.js";
 
-export const Recap = () => {
+export const RecapCvj = () => {
   const apiUrl = BACKEND;
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
@@ -82,7 +82,7 @@ export const Recap = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        apiUrl + "/api/transaction/show_transaction"
+        apiUrl + "/api/transaction/show_transaction_cvj"
       );
       const datsa = await response.json();
       setData(datsa);
@@ -93,7 +93,7 @@ export const Recap = () => {
   const fetchData2 = async () => {
     try {
       const response = await fetch(
-        apiUrl + "/api/transaction/show_pengeluaran"
+        apiUrl + "/api/transaction/show_pengeluaran_cvj"
       );
       const datsa = await response.json();
       setDataPengeluaran(datsa);
@@ -105,25 +105,25 @@ export const Recap = () => {
   const fetchAllKeuntungan = async () => {
     try {
       const responsePemasukanToday = await fetch(
-        apiUrl + "/api/pendapatan/show_pendapatan_harian"
+        apiUrl + "/api/pendapatan/show_pendapatan_harian_cvj"
       );
       const dataPemasukanToday = await responsePemasukanToday.json();
       setDataPendapatanHarian(dataPemasukanToday.total_today);
 
       const responsePemasukanMonth = await fetch(
-        apiUrl + "/api/pendapatan/show_pendapatan_bulanan"
+        apiUrl + "/api/pendapatan/show_pendapatan_bulanan_cvj"
       );
       const dataPemasukanMonth = await responsePemasukanMonth.json();
       setDataPendapatanBulanan(dataPemasukanMonth.total_current_month);
 
       const responsePengeluaranToday = await fetch(
-        apiUrl + "/api/pendapatan/show_pengeluaran_harian"
+        apiUrl + "/api/pendapatan/show_pengeluaran_harian_cvj"
       );
       const dataPengeluaranToday = await responsePengeluaranToday.json();
       setDataPengeluaranHarian(dataPengeluaranToday.total_pengeluaran_today);
 
       const responsePengeluaranMonth = await fetch(
-        apiUrl + "/api/pendapatan/show_pengeluaran_bulanan"
+        apiUrl + "/api/pendapatan/show_pengeluaran_bulanan_cvj"
       );
       const dataPengeluaranMonth = await responsePengeluaranMonth.json();
       setDataPengeluaranBulanan(
@@ -131,7 +131,7 @@ export const Recap = () => {
       );
 
       const responseKeuntunganToday = await fetch(
-        apiUrl + "/api/pendapatan/show_keuntungan_harian"
+        apiUrl + "/api/pendapatan/show_keuntungan_harian_cvj"
       );
       const dataKeuntunganToday = await responseKeuntunganToday.json();
       setDataKeuntunganHarian(
@@ -139,7 +139,7 @@ export const Recap = () => {
       );
 
       const responseKeuntunganMonth = await fetch(
-        apiUrl + "/api/pendapatan/show_keuntungan_bulanan"
+        apiUrl + "/api/pendapatan/show_keuntungan_bulanan_cvj"
       );
       const dataKeuntunganMonth = await responseKeuntunganMonth.json();
       setDataKeuntunganBulanan(
@@ -197,12 +197,15 @@ export const Recap = () => {
     <>
       <div>
         <div className="page-header">
-          <h3 className="page-title"> Rekap <label className="badge badge-info">Ceu Monny</label></h3>
+          <h3 className="page-title">
+            {" "}
+            Rekap <label className="badge badge-warning">CVJ</label>
+          </h3>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
                 <a href="!#" onClick={(event) => event.preventDefault()}>
-                  Rekap Ceu Monny
+                  Rekap CVJ
                 </a>
               </li>
               {/* <li className="breadcrumb-item active" aria-current="page">Basic tables</li> */}
@@ -214,7 +217,7 @@ export const Recap = () => {
             <div
               className="card"
               style={{
-                background: "linear-gradient(135deg, #39ff14, #f5e71f)",
+                background: "linear-gradient(135deg, #0000ff, #ffffff)", // Gradient from blue to white
               }}
             >
               <div className="card-body">
@@ -225,8 +228,8 @@ export const Recap = () => {
                         {formatIDR(datsaPendapatanHarian)}
                       </h3>
                       {/* <p className="text-success ml-2 mb-0 font-weight-medium">
-                        +3.5%
-                      </p> */}
+              +3.5%
+            </p> */}
                     </div>
                   </div>
                   <div className="col-3">
@@ -246,19 +249,19 @@ export const Recap = () => {
             <div
               className="card"
               style={{
-                background: "linear-gradient(to right, #ff0000, #ff7373)",
+                background: "linear-gradient(to right, #FFA500, #FFFFFF)", // Gradient from orange to white
               }}
             >
               <div className="card-body">
                 <div className="row">
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
-                      <h3 className="mb-0">
+                      <h3 className="mb-0 text-dark">
                         {formatIDR(datsaPengeluaranHarian)}
                       </h3>
                       {/* <p className="text-success ml-2 mb-0 font-weight-medium">
-                        +11%
-                      </p> */}
+              +11%
+            </p> */}
                     </div>
                   </div>
                   <div className="col-3">
@@ -267,17 +270,18 @@ export const Recap = () => {
                     </div>
                   </div>
                 </div>
-                <h6 className="text-white font-weight-normal">
+                <h6 className="text-dark font-weight-normal">
                   Pengeluaran Hari ini
                 </h6>
               </div>
             </div>
           </div>
+
           <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
             <div
               className="card"
               style={{
-                background: "linear-gradient(135deg, #8a2be2, #ffffff)",
+                background: "linear-gradient(135deg, #808080, #ffffff)", // Gradient from grey to white
               }}
             >
               <div className="card-body">
@@ -288,11 +292,11 @@ export const Recap = () => {
                         {formatIDR(datsaKeuntunganHarian)}
                       </h3>
                       {/* <p
-                        className="text-danger ml-2 mb-0 font-weight-medium"
-                        style={{ color: "#39ff14" }}
-                      >
-                        -2.4%
-                      </p> */}
+              className="text-danger ml-2 mb-0 font-weight-medium"
+              style={{ color: "#39ff14" }}
+            >
+              -2.4%
+            </p> */}
                     </div>
                   </div>
                   <div className="col-3">
@@ -304,7 +308,7 @@ export const Recap = () => {
                     </div>
                   </div>
                 </div>
-                <h6 className="font-weight-normal" style={{ color: "white" }}>
+                <h6 className="font-weight-normal text-dark" >
                   Pendapatan Bersih Hari ini
                 </h6>
               </div>
@@ -316,22 +320,22 @@ export const Recap = () => {
             <div
               className="card"
               style={{
-                backgroundImage: "linear-gradient(to right, #000000, #39ff14)",
+                backgroundImage: "linear-gradient(to right, #000000, #0000ff)", // Gradient from black to blue
               }}
             >
               <div className="card-body">
                 <div className="row">
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
-                      <h3 className="mb-0" style={{ color: "#39ff14" }}>
+                      <h3 className="mb-0" style={{ color: "blue" }}>
                         {formatIDR(datsaPendapatanBulanan)}
                       </h3>
                       {/* <p
-                        className="text-success ml-2 mb-0 font-weight-medium"
-                        style={{ color: "#39ff14" }}
-                      >
-                        +3.5%
-                      </p> */}
+              className="text-success ml-2 mb-0 font-weight-medium"
+              style={{ color: "#39ff14" }}
+            >
+              +3.5%
+            </p> */}
                     </div>
                   </div>
                   <div className="col-3">
@@ -351,22 +355,22 @@ export const Recap = () => {
             <div
               className="card"
               style={{
-                backgroundImage: "linear-gradient(to right, #000000, #ff0000)",
+                backgroundImage: "linear-gradient(to right, #000000, #FFA500)", // Gradient from black to orange
               }}
             >
               <div className="card-body">
                 <div className="row">
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
-                      <h3 className="mb-0" style={{ color: "#ff0000" }}>
+                      <h3 className="mb-0" style={{ color: "#FFA500" }}>
                         {formatIDR(datsaPengeluaranBulanan)}
                       </h3>
                       {/* <p
-                        className="text-success ml-2 mb-0 font-weight-medium"
-                        style={{ color: "#ff0000" }}
-                      >
-                        +11%
-                      </p> */}
+              className="text-success ml-2 mb-0 font-weight-medium"
+              style={{ color: "#ff0000" }}
+            >
+              +11%
+            </p> */}
                     </div>
                   </div>
                   <div className="col-3">
@@ -386,7 +390,7 @@ export const Recap = () => {
             <div
               className="card"
               style={{
-                backgroundImage: "linear-gradient(to right, #000000, #8a2be2)",
+                backgroundImage: "linear-gradient(to right, #000000, #808080)", // Gradient from black to grey
               }}
             >
               <div className="card-body">
@@ -423,8 +427,9 @@ export const Recap = () => {
                     {/* <label className="badge badge-success"> */}
 
                     <h4 className="card-title text-success">
-                      Rekap Pemasukan Ceu Monny                               
-                      </h4>                    
+                      Rekap Pemasukan CVJ
+                    </h4>
+                    {/* </label> */}
                   </div>
                   {/* <div className="col-lg-6 mr-auto text-sm-right ">
                     <a href="/inventory/create" className="align-items-right">
@@ -454,7 +459,7 @@ export const Recap = () => {
                 <Row>
                   <div className="col-lg-6 grid-margin stretch-card">
                     <h4 className="card-title text-danger">
-                      Rekap Pengeluaran Ceu Monny
+                      Rekap Pengeluaran CVJ
                     </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
@@ -531,4 +536,4 @@ export const Recap = () => {
     </>
   );
 };
-export default Recap;
+export default RecapCvj;
