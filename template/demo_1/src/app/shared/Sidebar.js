@@ -140,7 +140,7 @@ class Sidebar extends Component {
               <span className="menu-title"><Trans>Kasir</Trans></span>
             </Link>
           </li>
-          <li className={ this.isPathActive('/basic-ui') ? 'nav-item menu-items active' : 'nav-item menu-items' }>
+          {/* <li className={ this.isPathActive('/basic-ui') ? 'nav-item menu-items active' : 'nav-item menu-items' }>
             <div className={ this.state.basicUiMenuOpen ? 'nav-link menu-expanded' : 'nav-link' } onClick={ () => this.toggleMenuState('basicUiMenuOpen') } data-toggle="collapse">
               <span className="menu-icon">
                 <i className="mdi mdi-laptop"></i>
@@ -266,7 +266,7 @@ class Sidebar extends Component {
               </span>
               <span className="menu-title"><Trans>Documentation</Trans></span>
             </a>
-          </li>
+          </li> */}
         </ul>
       </nav>
     );
