@@ -99,7 +99,7 @@ export class Login extends Component {
             <div className="col-lg-4 mx-auto">
               <div className="card text-center py-5 px-4 px-sm-5">
                 <div className="brand-logo">
-                  <img src={require("../../assets/images/logo-morning-mood.png")} alt="logo" />
+                  <img src={require("../../assets/logo-ceu-monny.png")} alt="logo" />
                 </div>
                 <h4>Hello! Let's get started</h4>
                 <h6 className="font-weight-light">Sign in to continue.</h6>
