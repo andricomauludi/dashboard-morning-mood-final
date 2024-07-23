@@ -46,8 +46,8 @@ jobs:
 
           # Deploy Docker container to VM
           ssh -o StrictHostKeyChecking=no -i private_key.pem $SSH_USERNAME@$SSH_HOST << 'EOF'
-            docker pull ${{ secrets.DOCKER_IMAGE }}
-            docker stop pos-frontend-container || true
-            docker rm pos-frontend-container || true
-            docker run -d --name pos-frontend-container -p 8091:8091 ${{ secrets.DOCKER_IMAGE }}
+            sudo docker pull ${{ secrets.DOCKER_IMAGE }}
+            sudo docker stop pos-frontend-container || true
+            sudo docker rm pos-frontend-container || true
+            sudo docker run -d --name pos-frontend-container -p 8091:8091 ${{ secrets.DOCKER_IMAGE }}
           EOF
