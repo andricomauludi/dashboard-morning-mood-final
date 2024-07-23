@@ -7,6 +7,7 @@ import Slider from "react-slick";
 import TimeSpent from "./timestamphelper";
 import logo from "../../assets/logo-ceu-monny.png";
 import { BACKEND } from "../../constants";
+import ModalCustomMenu from "./ModalCustomMenu";
 
 export const PointOfSales = () => {
   const sliderSettings = {
@@ -20,10 +21,19 @@ export const PointOfSales = () => {
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingModal, setLoadingModal] = useState(false);
+  const [showModalCustom, setModalCustom] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [saveBillModal, setSaveBillModal] = useState(false);
   const [doneModal, setDoneModal] = useState(false);
   const [billToDelete, setBillToDelete] = useState(null); // State to keep track of the bill to delete
+
+  const handleCloseModalCustom = () => {
+    setModalCustom(false); // Close modal    
+  };
+  const handleShowCustomModal = (e) => {
+   setModalCustom(true);
+  };
+
 
   const handleButtonClick = (value) => {
     setSelectedTipe(value);
@@ -321,8 +331,7 @@ export const PointOfSales = () => {
       );
 
       const billId = billResponse.data.data.id;
-      setDataReceiptBill(billResponse.data.data);
-      console.log(billId);
+      setDataReceiptBill(billResponse.data.data);      
       // Include other necessary data for detail_bill here
       const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
         ...image,
@@ -683,7 +692,7 @@ export const PointOfSales = () => {
                   <div className="card-body">
                     <Slider className="portfolio-slider" {...sliderSettings}>
                       <div className="item">
-                        <h4 className="card-title">Makanan</h4>
+                        <h4 key="makanan" className="card-title">Makanan</h4>
                         <div className="row">
                           {datas.map((row, index) => (
                             <div className="col-sm-6 col-md-4 col-lg-3">
@@ -721,7 +730,7 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 className="card-title">Minuman</h4>
+                        <h4 key="minuman" className="card-title">Minuman</h4>
                         <div className="row">
                           {datas2.map((row, index) => (
                             <>
@@ -761,7 +770,7 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 className="card-title">Cemilan</h4>
+                        <h4 key="cemilan" className="card-title">Cemilan</h4>
                         <div className="row">
                           {datas3.map((row, index) => (
                             <>
@@ -801,7 +810,7 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 className="card-title">Barbershop</h4>
+                        <h4 key="barbershop" className="card-title">Barbershop</h4>
                         <div className="row">
                           {datas4.map((row, index) => (
                             <>
@@ -838,6 +847,44 @@ export const PointOfSales = () => {
                               </div>
                             </>
                           ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 className="card-title">Custom</h4>
+                        <div className="row">                          
+                            <>
+                              <div className="col-sm-6 col-md-4 col-lg-3">
+                                <div className="row justify-content-center">
+                                  <div
+                                    style={{
+                                      height: 150,
+                                      width: 150,
+                                      position: "relative",
+                                      overflow: "hidden",
+                                    }}
+                                  >
+                                    <Image
+                                      src={require("../../assets/images/custom-photo.png")}
+                                      alt={`custom`}
+                                      style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                      }}
+                                      onClick={() => handleShowCustomModal()}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>Klik di sini untuk kustom menu</h6>
+                                </div>
+                                {/* <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div> */}
+                              </div>
+                            </>                          
                         </div>
                       </div>
                     </Slider>
@@ -1004,6 +1051,8 @@ export const PointOfSales = () => {
                     <option value="Transfer Mandiri">Transfer Mandiri</option>
                     <option value="Transfer BCA">Transfer BCA</option>
                     <option value="QRIS">QRIS</option>
+                    <option value="OVO">OVO</option>
+                    <option value="Gopay">Gopay</option>
                   </select>
                 </Form.Group>
 
@@ -1195,8 +1244,7 @@ export const PointOfSales = () => {
                 </h5>
                 <h5 className="text-center">+62 821-1249-2060</h5>
                 {/* <p>Bill ID: {dataReceiptBill.id}</p> */}
-                <p>Order#{dataReceiptBill.id}</p>
-                {console.log(dataReceiptBill)}
+                <p>Order#{dataReceiptBill.id}</p>                
                 <h5 className="text-center">
                   ===========================================
                 </h5>
@@ -1295,6 +1343,11 @@ export const PointOfSales = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ModalCustomMenu 
+         show={showModalCustom}         
+         handleClose={handleCloseModalCustom}
+         handleImageClick={handleImageClick}
+         />
     </>
   );
 };
