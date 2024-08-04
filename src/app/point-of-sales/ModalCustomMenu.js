@@ -12,12 +12,12 @@ const ModalCustomMenu = ({
 
   // State to manage form data
   const [loading, setLoading] = useState(false);
+  const [nextId, setNextId] = useState(1); // State to keep track of the next available ID
   const initialFormData = {
+    id: 0, // Initialize ID
     nama_menu: "",
     jenis_menu: "",
-    harga: 0,
-    jumlah: 0,
-    total_harga: 0,
+    harga: 0
   };
   const [formData, setFormData] = useState(initialFormData);
 
@@ -25,7 +25,7 @@ const ModalCustomMenu = ({
     const { name, value } = event.target;
     let newFormData = {
       ...formData,
-      [name]: name === "harga" ? parseInt(value) : value,
+      [name]: name === "harga" ? parseFloat(value) : name === "jumlah" ? parseInt(value, 10) : value,
     };
 
     if (name === "harga" || name === "jumlah") {
@@ -44,10 +44,18 @@ const ModalCustomMenu = ({
   // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
-    console.log(formData)
+    setLoading(true);    
+      // Generate a unique ID
+      const uniqueId = nextId;
+
+      // Update formData with the new ID
+      const updatedFormData = { ...formData, id: uniqueId };
     try {
-      handleImageClick(formData)
+      handleImageClick(updatedFormData);
+
+      // Increment the ID for the next submission
+      setNextId(prevId => prevId + 1);
+
       setLoading(false);
       handleClose();
       setFormData(initialFormData); // Reset form fields to initial state
@@ -97,7 +105,7 @@ const ModalCustomMenu = ({
             </select>
           </Form.Group>
           <Form.Group controlId="formHargaMenu">
-            <Form.Label>Harga</Form.Label>
+            <Form.Label>Harga Satuan</Form.Label>
             <Form.Control
               type="number"
               placeholder="Enter harga"
@@ -107,7 +115,10 @@ const ModalCustomMenu = ({
               onChange={handleInputChange}
             />
           </Form.Group>
-          <Form.Group controlId="formJumlahMenu">
+          <Form.Group>
+            <Form.Label style={{color:"yellow"}}>Jumlah dan total harga silahkan di-setting di transaksi sebelah kanan halaman</Form.Label>           
+          </Form.Group>
+          {/* <Form.Group controlId="formJumlahMenu">
             <Form.Label>Jumlah</Form.Label>
             <Form.Control
               type="number"
@@ -132,7 +143,7 @@ const ModalCustomMenu = ({
               }
               disabled
             />
-          </Form.Group>
+          </Form.Group> */}
           <Button variant="primary" type="submit" disabled={loading}>
             {loading ? "Loading..." : "Submit"}
           </Button>

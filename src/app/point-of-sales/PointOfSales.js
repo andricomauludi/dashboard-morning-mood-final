@@ -102,6 +102,7 @@ export const PointOfSales = () => {
   };
 
   const handleImageClick = (image) => {
+    console.log(image)
     setSelectedImages((prevState) => {
       const existingImage = prevState.find((img) => img.id === image.id);
       if (existingImage) {
