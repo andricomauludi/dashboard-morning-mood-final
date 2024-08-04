@@ -8,12 +8,6 @@ import Cookies from "js-cookie";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
 
 class Navbar extends Component {
-  toggleOffcanvas() {
-    document.querySelector(".sidebar-offcanvas").classList.toggle("active");
-  }
-  toggleRightSidebar() {
-    document.querySelector(".right-sidebar").classList.toggle("open");
-  }
   handleLogout = async (event) => {
     const apiUrl = BACKEND; // Your backend URL
     event.preventDefault();

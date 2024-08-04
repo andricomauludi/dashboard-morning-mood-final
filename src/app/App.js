@@ -13,35 +13,18 @@ import axios from "axios";
 class App extends Component {
   state = {
     isAuthenticated: false,
+    isFullPageLayout: false,
+    isSidebarOpen: true, // Track the sidebar visibility
   };
+  toggleSidebar = () => {
+    this.setState((prevState) => ({
+      isSidebarOpen: !prevState.isSidebarOpen,
+    }));
+  };
+
   componentDidMount() {
     this.checkAuthentication();
     this.onRouteChanged();
-  }
-  render() {
-    // const { isAuthenticated } = this.state;
-
-    // if (!isAuthenticated) {
-    //   this.props.history.push("/user-pages/login-1"); // Adjust the login route as per your application
-
-    // }
-    let navbarComponent = !this.state.isFullPageLayout ? <Navbar /> : "";
-    let sidebarComponent = !this.state.isFullPageLayout ? <Sidebar /> : "";
-    let footerComponent = !this.state.isFullPageLayout ? <Footer /> : "";
-    return (
-      <div className="container-scroller">
-        {sidebarComponent}
-        <div className="container-fluid page-body-wrapper">
-          {navbarComponent}
-          <div className="main-panel">
-            <div className="content-wrapper">
-              <AppRoutes />
-            </div>
-            {footerComponent}
-          </div>
-        </div>
-      </div>
-    );
   }
 
   componentDidUpdate(prevProps) {
@@ -49,11 +32,12 @@ class App extends Component {
       this.onRouteChanged();
     }
   }
+
   checkAuthentication = async () => {
     console.log("check auth app");
-    const authToken = Cookies.get("Authorization"); // Replace with your actual cookie name
+    const authToken = Cookies.get("Authorization");
     if (authToken) {
-      const apiUrl = BACKEND; // Your backend URL
+      const apiUrl = BACKEND;
 
       try {
         const response = await axios.post(
@@ -65,27 +49,25 @@ class App extends Component {
             },
             withCredentials: true,
           }
-        );                
-        if (response.data.status == 1) {
+        );
+        if (response.data.status === 1) {
           this.setState({ isAuthenticated: true });
         } else {
           this.setState({ isAuthenticated: false });
-          // Clear the Authorization cookie and reset state for login retry                    
+          Cookies.remove("Authorization");
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
         this.setState({ isAuthenticated: false });
-        // Clear the Authorization cookie and reset state for login retry                    
-
+        Cookies.remove("Authorization");
       }
     } else {
       this.setState({ isAuthenticated: false });
-      // Redirect to login page or handle unauthorized access
-      this.props.history.push("/user-pages/login-1"); // Adjust the login route as per your application
+      this.props.history.push("/user-pages/login-1");
     }
   };
 
-  onRouteChanged() {
+  onRouteChanged = () => {
     const { i18n } = this.props;
     const body = document.querySelector("body");
     if (this.props.location.pathname === "/layout/RtlLayout") {
@@ -96,6 +78,7 @@ class App extends Component {
       i18n.changeLanguage("en");
     }
     window.scrollTo(0, 0);
+
     const fullPageLayoutRoutes = [
       "/user-pages/login-1",
       "/user-pages/login-2",
@@ -106,24 +89,41 @@ class App extends Component {
       "/error-pages/error-500",
       "/general-pages/landing-page",
     ];
+    let isFullPageLayout = false;
     for (let i = 0; i < fullPageLayoutRoutes.length; i++) {
       if (this.props.location.pathname === fullPageLayoutRoutes[i]) {
-        this.setState({
-          isFullPageLayout: true,
-        });
-        document
-          .querySelector(".page-body-wrapper")
-          .classList.add("full-page-wrapper");
+        isFullPageLayout = true;
         break;
-      } else {
-        this.setState({
-          isFullPageLayout: false,
-        });
-        document
-          .querySelector(".page-body-wrapper")
-          .classList.remove("full-page-wrapper");
       }
     }
+    this.setState({ isFullPageLayout }, () => {
+      if (isFullPageLayout) {
+        document.querySelector(".page-body-wrapper").classList.add("full-page-wrapper");
+      } else {
+        document.querySelector(".page-body-wrapper").classList.remove("full-page-wrapper");
+      }
+    });
+  };
+
+  render() {
+    let navbarComponent = !this.state.isFullPageLayout ? <Navbar /> : "";
+    let sidebarComponent = !this.state.isFullPageLayout ?<Sidebar toggleSidebar={this.toggleSidebar} /> : "";
+    let footerComponent = !this.state.isFullPageLayout ? <Footer /> : "";
+    let mainContentClass = this.state.isSidebarClosed ? "main-content-expanded" : "main-content";
+    return (
+      <div className="container-scroller">
+        {sidebarComponent}
+        <div className={`container-fluid page-body-wrapper ${mainContentClass}`}>
+          {navbarComponent}
+          <div className="main-panel">
+            <div className="content-wrapper">
+              <AppRoutes />
+            </div>
+            {footerComponent}
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 

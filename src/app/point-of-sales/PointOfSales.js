@@ -28,12 +28,11 @@ export const PointOfSales = () => {
   const [billToDelete, setBillToDelete] = useState(null); // State to keep track of the bill to delete
 
   const handleCloseModalCustom = () => {
-    setModalCustom(false); // Close modal    
+    setModalCustom(false); // Close modal
   };
   const handleShowCustomModal = (e) => {
-   setModalCustom(true);
+    setModalCustom(true);
   };
-
 
   const handleButtonClick = (value) => {
     setSelectedTipe(value);
@@ -331,7 +330,7 @@ export const PointOfSales = () => {
       );
 
       const billId = billResponse.data.data.id;
-      setDataReceiptBill(billResponse.data.data);      
+      setDataReceiptBill(billResponse.data.data);
       // Include other necessary data for detail_bill here
       const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
         ...image,
@@ -692,7 +691,9 @@ export const PointOfSales = () => {
                   <div className="card-body">
                     <Slider className="portfolio-slider" {...sliderSettings}>
                       <div className="item">
-                        <h4 key="makanan" className="card-title">Makanan</h4>
+                        <h4 key="makanan" className="card-title">
+                          Makanan
+                        </h4>
                         <div className="row">
                           {datas.map((row, index) => (
                             <div className="col-sm-6 col-md-4 col-lg-3">
@@ -730,7 +731,9 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 key="minuman" className="card-title">Minuman</h4>
+                        <h4 key="minuman" className="card-title">
+                          Minuman
+                        </h4>
                         <div className="row">
                           {datas2.map((row, index) => (
                             <>
@@ -770,7 +773,9 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 key="cemilan" className="card-title">Cemilan</h4>
+                        <h4 key="cemilan" className="card-title">
+                          Cemilan
+                        </h4>
                         <div className="row">
                           {datas3.map((row, index) => (
                             <>
@@ -810,7 +815,9 @@ export const PointOfSales = () => {
                         </div>
                       </div>
                       <div className="item">
-                        <h4 key="barbershop" className="card-title">Barbershop</h4>
+                        <h4 key="barbershop" className="card-title">
+                          Barbershop
+                        </h4>
                         <div className="row">
                           {datas4.map((row, index) => (
                             <>
@@ -851,40 +858,40 @@ export const PointOfSales = () => {
                       </div>
                       <div className="item">
                         <h4 className="card-title">Custom</h4>
-                        <div className="row">                          
-                            <>
-                              <div className="col-sm-6 col-md-4 col-lg-3">
-                                <div className="row justify-content-center">
-                                  <div
+                        <div className="row">
+                          <>
+                            <div className="col-sm-6 col-md-4 col-lg-3">
+                              <div className="row justify-content-center">
+                                <div
+                                  style={{
+                                    height: 150,
+                                    width: 150,
+                                    position: "relative",
+                                    overflow: "hidden",
+                                  }}
+                                >
+                                  <Image
+                                    src={require("../../assets/images/custom-photo.png")}
+                                    alt={`custom`}
                                     style={{
-                                      height: 150,
-                                      width: 150,
-                                      position: "relative",
-                                      overflow: "hidden",
+                                      display: "block",
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
                                     }}
-                                  >
-                                    <Image
-                                      src={require("../../assets/images/custom-photo.png")}
-                                      alt={`custom`}
-                                      style={{
-                                        display: "block",
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                      }}
-                                      onClick={() => handleShowCustomModal()}
-                                      layout="fill"
-                                    />
-                                  </div>
+                                    onClick={() => handleShowCustomModal()}
+                                    layout="fill"
+                                  />
                                 </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>Klik di sini untuk kustom menu</h6>
-                                </div>
-                                {/* <div className="row justify-content-center text-center m-3">
+                              </div>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>Klik di sini untuk kustom menu</h6>
+                              </div>
+                              {/* <div className="row justify-content-center text-center m-3">
                                   <h6>{formatPrice(row.harga)}</h6>
                                 </div> */}
-                              </div>
-                            </>                          
+                            </div>
+                          </>
                         </div>
                       </div>
                     </Slider>
@@ -893,8 +900,8 @@ export const PointOfSales = () => {
               </div>
             </div>
           </div>
-          <div className="col-md-4 grid-margin stretch-card">
-            <div className="card">
+          <div className="col-md-8 grid-margin stretch-card floating-card-container">
+            <div className="card floating-card">
               <div className="card-body">
                 <div className="row">
                   <div className="col-6">
@@ -913,56 +920,48 @@ export const PointOfSales = () => {
                   Order: {currentBillId === 0 ? "New" : `#${currentBillId}`}
                 </h6>
                 <div className="aligner-wrapper">
-                  {/* <h2>Selected Images:</h2> */}
                   {selectedImages.length > 0 ? (
                     <>
                       {selectedImages.map((image, index) => (
-                        <>
-                          <div
-                            key={index}
-                            className="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3"
-                          >
-                            <div className="text-md-center text-xl-left">
-                              <h6 className="mb-1">{image.nama_menu}</h6>
-                              <div className="form-inline">
-                                <p className="text-muted mb-0">
-                                  {formatPrice(image.harga)} x{" "}
-                                  <input
-                                    type="number"
-                                    value={image.jumlah}
-                                    min="0"
-                                    className="form-control"
-                                    onChange={(e) =>
-                                      handleCountChange(
-                                        image.id,
-                                        e.target.value
-                                      )
-                                    }
-                                    style={{ width: "60px" }}
-                                  />
-                                </p>
-                              </div>
-                            </div>
-                            <div className="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
-                              <h6 className="font-weight-bold mb-2">
-                                {formatPrice(image.harga * image.jumlah)}{" "}
-                              </h6>
-                              <button
-                                className="btn btn-rounded btn-inverse-danger"
-                                onClick={() => handleDelete2(image.id)}
-                              >
-                                Delete
-                              </button>
+                        <div
+                          key={index}
+                          className="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3"
+                        >
+                          <div className="text-md-center text-xl-left">
+                            <h6 className="mb-1">{image.nama_menu}</h6>
+                            <div className="form-inline">
+                              <p className="text-muted mb-0">
+                                {formatPrice(image.harga)} x{" "}
+                                <input
+                                  type="number"
+                                  value={image.jumlah}
+                                  min="0"
+                                  className="form-control"
+                                  onChange={(e) =>
+                                    handleCountChange(image.id, e.target.value)
+                                  }
+                                  style={{ width: "60px" }}
+                                />
+                              </p>
                             </div>
                           </div>
-                        </>
+                          <div className="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0">
+                            <h6 className="font-weight-bold mb-2">
+                              {formatPrice(image.harga * image.jumlah)}{" "}
+                            </h6>
+                            <button
+                              className="btn btn-rounded btn-inverse-danger"
+                              onClick={() => handleDelete2(image.id)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </>
                   ) : (
                     <></>
-                    // <p>No images selected yet.</p>
                   )}
-                  {/* <h3>Total Count: {getTotalCount()}</h3> */}
                   <div className="row mt-3">
                     <div className="col-lg-6 text-xl-left">
                       <h6>Total Pembayaran:</h6>
@@ -1012,20 +1011,24 @@ export const PointOfSales = () => {
                 Total Pembayaran {formatPrice(getTotalPrice())}{" "}
               </h3>
               <form onSubmit={handleSubmit} className="forms-sample">
-                <div >
+                <div>
                   <button
-                  type="button"
+                    type="button"
                     className={`btn ${
-                      selectedTipe === "0" ? "btn btn-warning btn-lg mr-5" : "btn btn-outline-secondary btn-lg mr-5"
+                      selectedTipe === "0"
+                        ? "btn btn-warning btn-lg mr-5"
+                        : "btn btn-outline-secondary btn-lg mr-5"
                     }`}
                     onClick={() => handleButtonClick("0")}
                   >
                     Kedai Ceu Monny
                   </button>
                   <button
-                  type="button"
+                    type="button"
                     className={`btn ${
-                      selectedTipe === "1"? "btn btn-warning btn-lg" : "btn btn-outline-secondary btn-lg"
+                      selectedTipe === "1"
+                        ? "btn btn-warning btn-lg"
+                        : "btn btn-outline-secondary btn-lg"
                     }`}
                     onClick={() => handleButtonClick("1")}
                   >
@@ -1244,7 +1247,7 @@ export const PointOfSales = () => {
                 </h5>
                 <h5 className="text-center">+62 821-1249-2060</h5>
                 {/* <p>Bill ID: {dataReceiptBill.id}</p> */}
-                <p>Order#{dataReceiptBill.id}</p>                
+                <p>Order#{dataReceiptBill.id}</p>
                 <h5 className="text-center">
                   ===========================================
                 </h5>
@@ -1343,11 +1346,11 @@ export const PointOfSales = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ModalCustomMenu 
-         show={showModalCustom}         
-         handleClose={handleCloseModalCustom}
-         handleImageClick={handleImageClick}
-         />
+      <ModalCustomMenu
+        show={showModalCustom}
+        handleClose={handleCloseModalCustom}
+        handleImageClick={handleImageClick}
+      />
     </>
   );
 };
