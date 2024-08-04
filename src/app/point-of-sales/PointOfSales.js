@@ -26,6 +26,7 @@ export const PointOfSales = () => {
   const [saveBillModal, setSaveBillModal] = useState(false);
   const [doneModal, setDoneModal] = useState(false);
   const [billToDelete, setBillToDelete] = useState(null); // State to keep track of the bill to delete
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const handleCloseModalCustom = () => {
     setModalCustom(false); // Close modal
@@ -36,6 +37,7 @@ export const PointOfSales = () => {
 
   const handleButtonClick = (value) => {
     setSelectedTipe(value);
+    setShowPaymentForm(true); // Show payment form when a button is clicked
   };
 
   const handleClose = () => setShow(false);
@@ -102,7 +104,7 @@ export const PointOfSales = () => {
   };
 
   const handleImageClick = (image) => {
-    console.log(image)
+    console.log(image);
     setSelectedImages((prevState) => {
       const existingImage = prevState.find((img) => img.id === image.id);
       if (existingImage) {
@@ -254,6 +256,7 @@ export const PointOfSales = () => {
       setSelectedPayment("");
       setSelectedTipe("");
       setCurrentBillId(0);
+      setShowPaymentForm(false); // Show payment form when a button is clicked
 
       // Close the modal after successful submission s
       handleClose();
@@ -997,22 +1000,17 @@ export const PointOfSales = () => {
         backdrop="static"
         keyboard={false}
       >
-        {/* <Modal.Header closeButton>
-          <Modal.Title>Modal title</Modal.Title>
-        </Modal.Header> */}
         <Modal.Body>
           <div className="card">
             <div className="card-body">
               <h4 className="card-title">Pembayaran</h4>
               <p>Order No : Order#109</p>
               <p>Klien : Guest</p>
-              {/* <p className="card-description"> Total Pembayaran {formatPrice(getTotalPrice())} </p> */}
               <h3 className="text-warning">
-                {" "}
-                Total Pembayaran {formatPrice(getTotalPrice())}{" "}
+                Total Pembayaran {formatPrice(getTotalPrice())}
               </h3>
               <form onSubmit={handleSubmit} className="forms-sample">
-                <div>
+                <div className="mb-3">
                   <button
                     type="button"
                     className={`btn ${
@@ -1036,29 +1034,36 @@ export const PointOfSales = () => {
                     CVJ
                   </button>
                 </div>
-                <Form.Group>
-                  <label className="mt-2" htmlFor="exampleFormControlSelect2">
-                    Jenis Pembayaran
-                  </label>
-                  <select
-                    className="form-control text-white form-control-lg"
-                    id="exampleFormControlSelect2"
-                    value={selectedPayment}
-                    onChange={handlePaymentChange}
-                  >
-                    {!selectedPayment && (
-                      <option value="">
-                        Silahkan klik untuk memilih jenis pembayaran
-                      </option>
-                    )}
-                    <option value="Cash">Cash</option>
-                    <option value="Transfer Mandiri">Transfer Mandiri</option>
-                    <option value="Transfer BCA">Transfer BCA</option>
-                    <option value="QRIS">QRIS</option>
-                    <option value="OVO">OVO</option>
-                    <option value="Gopay">Gopay</option>
-                  </select>
-                </Form.Group>
+
+                <h5 className="text-danger">
+                  TRANSAKSI KEDAI CEU MONNY DAN CVJ HARAP DIPISAH
+                </h5>
+
+                {showPaymentForm && (
+                  <Form.Group>
+                    <label className="mt-2" htmlFor="exampleFormControlSelect2">
+                      Jenis Pembayaran
+                    </label>
+                    <select
+                      className="form-control text-white form-control-lg"
+                      id="exampleFormControlSelect2"
+                      value={selectedPayment}
+                      onChange={handlePaymentChange}
+                    >
+                      {!selectedPayment && (
+                        <option value="">
+                          Silahkan klik untuk memilih jenis pembayaran
+                        </option>
+                      )}
+                      <option value="Cash">Cash</option>
+                      <option value="Transfer Mandiri">Transfer Mandiri</option>
+                      <option value="Transfer BCA">Transfer BCA</option>
+                      <option value="QRIS">QRIS</option>
+                      <option value="OVO">OVO</option>
+                      <option value="Gopay">Gopay</option>
+                    </select>
+                  </Form.Group>
+                )}
 
                 {selectedPayment && (
                   <>
@@ -1087,7 +1092,6 @@ export const PointOfSales = () => {
                         <p>Silahkan transfer ke nomor rekening di bawah ini</p>
                         <label>Nomor Rekening Mandiri</label>
                         <h3 className="text-success">1330-0109-5082-2</h3>
-                        {/* ini masih rekening mandiri */}
                       </Form.Group>
                     )}
                     {selectedPayment === "Transfer BCA" && (
