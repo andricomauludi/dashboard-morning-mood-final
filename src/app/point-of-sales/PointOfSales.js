@@ -1004,11 +1004,14 @@ export const PointOfSales = () => {
           <div className="card">
             <div className="card-body">
               <h4 className="card-title">Pembayaran</h4>
-              <p>Order No : Order#109</p>
-              <p>Klien : Guest</p>
+              {/* <p>Order No : Order#109</p>
+              <p>Klien : Guest</p> */}
               <h3 className="text-warning">
                 Total Pembayaran {formatPrice(getTotalPrice())}
               </h3>
+              <h6 className="text-danger">
+                TRANSAKSI KEDAI CEU MONNY DAN CVJ HARAP DIPISAH
+              </h6>
               <form onSubmit={handleSubmit} className="forms-sample">
                 <div className="mb-3">
                   <button
@@ -1034,10 +1037,6 @@ export const PointOfSales = () => {
                     CVJ
                   </button>
                 </div>
-
-                <h5 className="text-danger">
-                  TRANSAKSI KEDAI CEU MONNY DAN CVJ HARAP DIPISAH
-                </h5>
 
                 {showPaymentForm && (
                   <Form.Group>
@@ -1099,6 +1098,33 @@ export const PointOfSales = () => {
                         <p>Silahkan transfer ke nomor rekening di bawah ini</p>
                         <label>Nomor Rekening BCA</label>
                         <h3 className="text-success">8410-0875-89</h3>
+                      </Form.Group>
+                    )}
+                    {selectedPayment === "QRIS" && (
+                      <Form.Group>
+                        <p>Silahkan scan QRIS di bawah ini</p>
+                        <label>QRIS Kedai Ceu Monny</label>
+                        <div
+                          style={{
+                            height: 400,
+                            width: 300,
+                            position: "relative",
+                            left:"auto",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Image
+                            src={require("../../assets/images/qris-scan.jpeg")}
+                            alt={`gambar-QRIS`}
+                            style={{
+                              display: "block",
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            layout="fill"
+                          />
+                        </div>
                       </Form.Group>
                     )}
                   </>
