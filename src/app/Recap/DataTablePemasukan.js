@@ -333,7 +333,7 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
               className="form-control text-white"
               value={searchInput}
               onChange={handleSearchChange}
-              placeholder={"Search..."}
+              placeholder={"Cari..."}
               style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
             />
           </div>
@@ -342,7 +342,7 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
               <div className="col-md-6">
                 <div className="row form-inline">
                   <span>
-                    Go to :{" "}
+                    Ke halaman :{" "}
                     <input
                       className="form-control"
                       type="number"
@@ -368,7 +368,7 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
                 >
                   {[10, 20, 30, 40, 50].map((pageSize) => (
                     <option key={pageSize} value={pageSize}>
-                      Show {pageSize}
+                      {pageSize} data
                     </option>
                   ))}
                 </select>
@@ -378,28 +378,28 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
         </div>
         <div className="row mt-3 d-flex justify-content-center">
           <button
-            className="btn btn-inverse-warning btn-lg"
+            className="btn btn-warning btn-lg"
             onClick={() => gotoPage(0)}
             disabled={!canPreviousPage}
           >
             {"<<"}
           </button>
           <button
-            className="btn btn-inverse-warning btn-lg"
+            className="btn btn-warning btn-lg"
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
           >
             {"<"}
           </button>
           <button
-            className="btn btn-inverse-warning btn-lg"
+            className="btn btn-warning btn-lg"
             onClick={() => nextPage()}
             disabled={!canNextPage}
           >
             {">"}
           </button>
           <button
-            className="btn btn-inverse-warning btn-lg"
+            className="btn btn-warning btn-lg"
             onClick={() => gotoPage(pageCount - 1)}
             disabled={!canNextPage}
           >
