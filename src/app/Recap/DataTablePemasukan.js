@@ -160,22 +160,24 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
   };
 
   const filteredData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+  
     if (!selectedYear && !selectedMonth && !selectedDay) return data;
-
+  
     return data.filter((row) => {
       const date = new Date(row.Bill.Timestamp);
       const year = date.getFullYear().toString();
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const day = date.getDate().toString().padStart(2, "0");
-
+  
       const yearMatches = selectedYear ? year === selectedYear : true;
       const monthMatches = selectedMonth ? month === selectedMonth : true;
-      const dayMatches =
-        selectedDay === "Semua Hari" ? true : day === selectedDay;
-
+      const dayMatches = selectedDay === "Semua Hari" ? true : day === selectedDay;
+  
       return yearMatches && monthMatches && dayMatches;
     });
   }, [data, selectedYear, selectedMonth, selectedDay]);
+  
 
   const transformedData = useMemo(
     () =>
@@ -261,12 +263,12 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
     setSearchInput(value);
     setGlobalFilter(value);
   };
-  if (!data)
-    return (
-      <>
-        <p>Loading</p>
-      </>
-    );
+  // if (!data)
+  //   return (
+  //     <>
+  //       <p>Loading</p>
+  //     </>
+  //   );
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 2 }, (_, i) =>

@@ -10,6 +10,7 @@ import DatatablePengeluaran from "./DataTablePengeluaran.js";
 import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
 import { COLUMNSPENGELUARAN } from "./ColumnsPengeluaran.js";
 import ModalCreatePengeluaran from "./ModalCreatePengeluaran.js";
+import ExcelExportForm from "./ExcelExportForm.js";
 
 export const Recap = () => {
   const apiUrl = BACKEND;
@@ -426,16 +427,17 @@ export const Recap = () => {
                       Rekap Pemasukan Ceu Monny                               
                       </h4>                    
                   </div>
-                  {/* <div className="col-lg-6 mr-auto text-sm-right ">
-                    <a href="/inventory/create" className="align-items-right">
+                  <div className="col-lg-6 mr-auto text-sm-right ">
+                    {/* <a href="/inventory/create" className="align-items-right">
                       <button className="btn btn-outline-warning">
                         <span>
                           <i className="mdi mdi-plus"></i>
                         </span>
                         Create Pemasukan
-                      </button>
-                    </a>
-                  </div> */}
+                      </button> */}
+                        <ExcelExportForm />
+                    {/* </a> */}
+                  </div>
                 </Row>
                 <div className="table-responsive">
                   <DataTable
@@ -467,6 +469,7 @@ export const Recap = () => {
                       </span>
                       Create Pengeluaran
                     </button>
+                  
                   </div>
                 </Row>
                 <div className="table-responsive">
