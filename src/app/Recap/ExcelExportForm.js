@@ -107,7 +107,7 @@ const ExcelExportForm = () => {
           </Form>
           {downloadUrl && (
             <div className="mt-3">
-              <a href={downloadUrl} download="transactions.xlsx">
+              <a href={downloadUrl} download="rekap-ceu-monny.xlsx">
               <Button variant="primary" type="button">
               Klik di sini untuk download excel
             </Button>
