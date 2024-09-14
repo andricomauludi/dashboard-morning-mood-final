@@ -49,5 +49,5 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_IMAGE }}
             sudo docker stop pos-frontend-container || true
             sudo docker rm pos-frontend-container || true
-            sudo docker run -d --name pos-frontend-container -p 3000:3000 ${{ secrets.DOCKER_IMAGE }}
+             sudo docker run -d --name pos-frontend-container -p 3000:3000 -p 80:3000 ${{ secrets.DOCKER_IMAGE }}
           EOF
