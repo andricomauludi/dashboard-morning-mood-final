@@ -103,7 +103,7 @@ export class Dashboard extends Component {
                       We are thrilled wth your passion
                     </p> */}
                     <p className="mb-0 font-weight-normal d-none d-sm-block">
-                     GAK KERJA GAK KAYAK BROKKKKKKKKKKKK
+                     GAK KERJA GAK KAYA BROKKKKKKKKKKKK
                     </p>
                   </div>
                   {/* <div className="col-3 col-sm-2 col-xl-2 pl-0 text-center">

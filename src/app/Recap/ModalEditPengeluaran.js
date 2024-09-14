@@ -18,14 +18,21 @@ const ModalEditPengeluaran = ({ show, handleClose, bill, handleSave, handleChang
               onChange={handleChange} 
             />
           </Form.Group>
-          <Form.Group>
-            <Form.Label>Jenis Pengleuaran</Form.Label>
-            <Form.Control 
-              type="text" 
-              name="jenis_pengeluaran" 
+          <Form.Group controlId="formJenisPengeluaran">
+            <Form.Label>Jenis Pengeluaran</Form.Label>
+            <select
+              name="jenis_pengeluaran"
+              className="form-control text-white form-control-lg"
               value={bill.jenis_pengeluaran} 
               onChange={handleChange} 
-            />
+            >
+              <option value="">Pilih jenis pengeluaran</option>
+              <option value="Cash">Cash</option>
+              <option value="Transfer Mandiri">Transfer Mandiri</option>
+              <option value="Transfer BCA">Transfer BCA</option>
+              <option value="QRIS">QRIS</option>
+              <option value="OVO">OVO</option>
+            </select>
           </Form.Group>
                  
           <Form.Group>

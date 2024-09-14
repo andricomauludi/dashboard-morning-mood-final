@@ -231,8 +231,7 @@ export const PointOfSales = () => {
       );
 
       const billId = billResponse.data.data.id;
-      setDataReceiptBill(billResponse.data.data);
-      console.log(billId);
+      setDataReceiptBill(billResponse.data.data);      
       // Include other necessary data for detail_bill here
       const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
         ...image,

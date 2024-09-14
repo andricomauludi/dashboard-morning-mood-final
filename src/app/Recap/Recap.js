@@ -1,5 +1,6 @@
 import React, { Component, useEffect, useState } from "react";
 import { Modal, ProgressBar, Row } from "react-bootstrap";
+import { Dropdown, ButtonGroup } from "react-bootstrap";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
 import { Loading } from "react-loading-wrapper";
@@ -17,6 +18,9 @@ export const Recap = () => {
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");
+  const [totalCurrentMonth, setTotalCurrentMonth] = useState(0);
+  const [totalCurrentDay, setTotalCurrentDay] = useState(0);
 
   function formatIDR(amount) {
     const formatter = new Intl.NumberFormat("id-ID", {
@@ -152,13 +156,52 @@ export const Recap = () => {
     }
   };
 
+  const fetchTotal = async (jenis) => {
+    const apiUrl = BACKEND;
+    const formData = new FormData();
+    formData.append("jenis_pembayaran", jenisPembayaran);
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/pendapatan/show_pendapatan_bulanan_pembayaran`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalCurrentMonth(response.data.total_current_month);
+      const responseCurrentToday = await axios.post(
+        `${apiUrl}/api/pendapatan/show_pendapatan_harian_pembayaran`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalCurrentDay(responseCurrentToday.data.total_today);
+
+
+      // Optionally, refresh the dataSavedBill list or remove the deleted item from the state
+    } catch (error) {
+      console.error("Error fetching total:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     fetchData2();
     fetchAllKeuntungan();
+    fetchTotal(jenisPembayaran);
     return;
     // dispatch(getSandwichLists());
-  }, []);
+  }, [jenisPembayaran]);
+
+  const handleSelect = (eventKey) => {
+    setJenisPembayaran(eventKey);
+  };
 
   if (!datsa) {
     return (
@@ -198,7 +241,10 @@ export const Recap = () => {
     <>
       <div>
         <div className="page-header">
-          <h3 className="page-title"> Rekap <label className="badge badge-info">Ceu Monny</label></h3>
+          <h3 className="page-title">
+            {" "}
+            Rekap <label className="badge badge-info">Ceu Monny</label>
+          </h3>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
@@ -209,6 +255,39 @@ export const Recap = () => {
               {/* <li className="breadcrumb-item active" aria-current="page">Basic tables</li> */}
             </ol>
           </nav>
+        </div>
+        <div className="row">
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <Dropdown onSelect={handleSelect}>
+              <Dropdown.Toggle
+                variant="btn btn-warning"
+                id="dropdownMenuButton4"
+              >
+                Pilih Jenis Pembayaran untuk Dashboard
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="Semua Jenis">
+                  Semua Jenis
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="Cash">Cash</Dropdown.Item>
+                <Dropdown.Item eventKey="Transfer Mandiri">
+                  Transfer Mandiri
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="Transfer BCA">
+                  Transfer BCA
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="QRIS">QRIS</Dropdown.Item>
+                <Dropdown.Item eventKey="OVO">OVO</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <div className="mt-3">           
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
+            <h1>{jenisPembayaran} </h1>
+          </div>
         </div>
         <div className="row">
           <div className="col-xl-4 col-sm-6 grid-margin stretch-card">
@@ -223,7 +302,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0 text-dark">
-                        {formatIDR(datsaPendapatanHarian)}
+                        {formatIDR(totalCurrentDay)}
                       </h3>
                       {/* <p className="text-success ml-2 mb-0 font-weight-medium">
                         +3.5%
@@ -325,7 +404,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0" style={{ color: "#39ff14" }}>
-                        {formatIDR(datsaPendapatanBulanan)}
+                        {formatIDR(totalCurrentMonth)}
                       </h3>
                       {/* <p
                         className="text-success ml-2 mb-0 font-weight-medium"
@@ -424,8 +503,8 @@ export const Recap = () => {
                     {/* <label className="badge badge-success"> */}
 
                     <h4 className="card-title text-success">
-                      Rekap Pemasukan Ceu Monny                               
-                      </h4>                    
+                      Rekap Pemasukan Ceu Monny
+                    </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
                     {/* <a href="/inventory/create" className="align-items-right">
@@ -435,7 +514,7 @@ export const Recap = () => {
                         </span>
                         Create Pemasukan
                       </button> */}
-                        <ExcelExportForm />
+                    <ExcelExportForm />
                     {/* </a> */}
                   </div>
                 </Row>
@@ -469,7 +548,6 @@ export const Recap = () => {
                       </span>
                       Create Pengeluaran
                     </button>
-                  
                   </div>
                 </Row>
                 <div className="table-responsive">
