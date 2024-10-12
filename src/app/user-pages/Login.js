@@ -50,7 +50,7 @@ export class Login extends Component {
           sameSite: "None",
         });
         this.setState({ isAuthenticated: true });
-        this.props.onLoginSuccess();
+        // this.props.onLoginSuccess();
       }
     } catch (error) {
       console.error("Error saat login:", error);
