@@ -42,17 +42,28 @@ export class Login extends Component {
 
       if (response.status === 200) {
         const authToken = response.data.data.token;
-        Cookies.set("Authorization", authToken, { expires: 1, path: '/', secure: true, sameSite: 'None' });
+        console.log("Token yang diterima:", authToken); // Log token
+        Cookies.set("Authorization", authToken, {
+          expires: 1,
+          path: "/",
+          secure: true,
+          sameSite: "None",
+        });
         this.setState({ isAuthenticated: true });
         this.props.onLoginSuccess();
       }
     } catch (error) {
-      this.setState({ errorMessage: "Invalid username or password", loading: false });
+      console.error("Error saat login:", error);
+      this.setState({
+        errorMessage: "Invalid username or password",
+        loading: false,
+      });
     }
   };
 
   render() {
-    const { username, password, isAuthenticated, errorMessage, loading } = this.state;
+    const { username, password, isAuthenticated, errorMessage, loading } =
+      this.state;
 
     if (isAuthenticated) {
       return <Redirect to="/dashboard" />;
@@ -65,7 +76,10 @@ export class Login extends Component {
             <div className="col-lg-4 mx-auto">
               <div className="card text-center py-5 px-4 px-sm-5">
                 <div className="brand-logo">
-                  <img src={require("../../assets/logo-ceu-monny.png")} alt="logo" />
+                  <img
+                    src={require("../../assets/logo-ceu-monny.png")}
+                    alt="logo"
+                  />
                 </div>
                 <h4>Hello! Let's get started</h4>
                 <h6 className="font-weight-light">Sign in to continue.</h6>
@@ -94,7 +108,9 @@ export class Login extends Component {
                       required
                     />
                   </Form.Group>
-                  {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                  {errorMessage && (
+                    <div className="alert alert-danger">{errorMessage}</div>
+                  )}
                   <div className="mt-3">
                     <Button
                       className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
