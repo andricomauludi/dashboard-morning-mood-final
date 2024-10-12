@@ -82,28 +82,28 @@ export class Dashboard extends Component {
               <div className="card-body py-0 px-0 px-sm-3">
                 <div className="row align-items-center">
                   <div className="col-4 col-sm-3 col-xl-4 mt-2">
-                    <img
+                    {/* <img
                       src={require("../../assets/logo-ceu-monny.png")}
                       // src={require("../../assets/images/dashboard/Group126@2x.png")}
                       className="gradient-corona-img img-fluid"
                       alt="banner"
-                    />
+                    /> */}
                   </div>
                   <div
                     className="col-8 col-sm-7"
-                    style={{ marginLeft: "30px" }}
+                    style={{ marginLeft: "30px", marginTop:"50px", marginBottom:"50px" }}
                   >
                     {/* <h4 className="mb-1 mb-sm-0">
                       Lets Get Started, Contribute your Morning Mood !
                     </h4> */}
                     <h4 className="mb-1 mb-sm-0">
-                     YOK KERJA YOK
+                     Hello
                     </h4>
                     {/* <p className="mb-0 font-weight-normal d-none d-sm-block">
                       We are thrilled wth your passion
                     </p> */}
                     <p className="mb-0 font-weight-normal d-none d-sm-block">
-                     GAK KERJA GAK KAYA BROKKKKKKKKKKKK
+                     Welcome to Andricomauludi's POS
                     </p>
                   </div>
                   {/* <div className="col-3 col-sm-2 col-xl-2 pl-0 text-center">
@@ -130,12 +130,12 @@ export class Dashboard extends Component {
               </div>
             </div>
           </div>
-          <div className="col-md-6 grid-margin stretch-card">
+          {/* <div className="col-md-6 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
                 <div className="d-flex flex-row justify-content-between">
-                  <h4 className="card-title mb-1">Open Projects</h4>
-                  <p className="text-muted mb-1">Your data status</p>
+                  <h4 className="card-title mb-1">Catatan</h4>
+                  <p className="text-muted mb-1">Tanggal</p>
                 </div>
                 <div className="row">
                   <div className="col-12">
@@ -252,9 +252,9 @@ export class Dashboard extends Component {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
-        <div className="row">
+        {/* <div className="row">
           <div className="col-md-4 grid-margin stretch-card">
             <div className="card">
               <div className="card-body">
@@ -959,7 +959,7 @@ export class Dashboard extends Component {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   }

@@ -5,11 +5,25 @@ import { Trans } from "react-i18next";
 import { BACKEND } from "../../constants";
 import axios from "axios";
 import Cookies from "js-cookie";
+import Spinner from "../shared/Spinner";
 import { withRouter } from "react-router-dom/cjs/react-router-dom.min";
+import ImageModal from "./ImageModal"; // Import the modal component
+
 
 class Navbar extends Component {
+  state = {
+    showModal: false,
+    currentImageSrc: "",
+  };
+
+  handleImageClick = (imgSrc) => {
+    this.setState({ currentImageSrc: imgSrc, showModal: true });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false });
+  };
   handleLogout = async (event) => {
-    const apiUrl = BACKEND; // Your backend URL
     event.preventDefault();
 
     try {
@@ -20,8 +34,10 @@ class Navbar extends Component {
         return;
       }
 
+      const apiUrl = BACKEND; // Your backend URL
+
       // Send a POST request to logout endpoint with Authorization header
-      await axios.post(
+      const response = await axios.post(
         `${apiUrl}/api/auth/logout`,
         {},
         {
@@ -32,17 +48,41 @@ class Navbar extends Component {
         }
       );
 
-      // Remove the Authorization cookie
-      Cookies.remove('Authorization', { path: '' }) // removed!
+      // Check if the logout request was successful
+      if (response.status === 200) {
+        // Remove the Authorization cookie
+        Cookies.remove("Authorization", { path: "/" });
 
-      // Redirect to login page after successful logout
-      this.props.history.push("/user-pages/login-1");
+        // Redirect to the login page
+        this.props.history.push("/user-pages/login-1"); // Ensure this.props.history is available
+      } else {
+        console.error("Failed to log out:", response.status);
+      }
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
 
   render() {
+    if (this.props.loading) {
+      return <Spinner />;
+    }
+    const { userUsername, userRole } = this.props; // Get userRole from props
+    {
+      console.log(userUsername);
+    }
+
+    const { showModal, currentImageSrc } = this.state;
+
+    const imageSrc =
+      this.props.userUsername === "Anrizqa Dewi Rachmani"
+        ? require("../../assets/images/faces/profile-anrizqa.jpeg")
+        : this.props.userUsername === "Superadmin"
+        ? require("../../assets/images/faces/profile-teams.jpg")
+        : this.props.userUsername === "kasir"
+        ? require("../../assets/images/faces/profile-default.jpg")
+        : require("../../assets/images/faces/profile-default.jpg");
+
     return (
       <nav className="navbar p-0 fixed-top d-flex flex-row">
         <div className="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
@@ -324,23 +364,25 @@ class Navbar extends Component {
                 className="nav-link cursor-pointer no-caret"
               >
                 <div className="navbar-profile">
-                  <img
-                    className="img-xs rounded-circle"
-                    src={require("../../assets/images/faces/profile-teams.jpg")}
-                    alt="profile"
-                  />
+                <div
+                    className="profile-pic"
+                    onClick={() => this.handleImageClick(imageSrc)}
+                  >
+                    <img
+                      className="img-xs rounded-circle"
+                      src={imageSrc}
+                      alt="profile"
+                    />
+                  </div>
                   <p className="mb-0 d-none d-sm-block navbar-profile-name">
-                    <Trans>Andrico Mauludi Junianto</Trans>
+                    <Trans>{userUsername}</Trans>
                   </p>
                   <i className="mdi mdi-menu-down d-none d-sm-block"></i>
                 </div>
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="navbar-dropdown preview-list navbar-profile-dropdown-menu">
-                <h6 className="p-3 mb-0">
-                  <Trans>Profile</Trans>
-                </h6>
-                <Dropdown.Divider />
+                {/* <Dropdown.Divider />
                 <Dropdown.Item
                   href="!#"
                   onClick={(evt) => evt.preventDefault()}
@@ -356,7 +398,7 @@ class Navbar extends Component {
                       <Trans>Settings</Trans>
                     </p>
                   </div>
-                </Dropdown.Item>
+                </Dropdown.Item> */}
                 <Dropdown.Divider />
                 <Dropdown.Item
                   href="!#"
@@ -375,9 +417,6 @@ class Navbar extends Component {
                   </div>
                 </Dropdown.Item>
                 <Dropdown.Divider />
-                <p className="p-3 mb-0 text-center">
-                  <Trans>Advanced settings</Trans>
-                </p>
               </Dropdown.Menu>
             </Dropdown>
           </ul>
@@ -390,6 +429,12 @@ class Navbar extends Component {
             <span className="mdi mdi-format-line-spacing"></span>
           </button>
         </div>
+        {showModal && (
+          <ImageModal
+            imageSrc={currentImageSrc} // Kirim src gambar ke modal
+            onClose={this.handleCloseModal} // Kirim fungsi untuk menutup modal
+          />
+        )}
       </nav>
     );
   }

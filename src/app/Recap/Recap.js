@@ -21,6 +21,10 @@ export const Recap = () => {
   const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");
   const [totalCurrentMonth, setTotalCurrentMonth] = useState(0);
   const [totalCurrentDay, setTotalCurrentDay] = useState(0);
+  const [totalPengeluaranDay, setTotalPengeluaranDay] = useState(0);
+  const [totalPengeluaranMonth, setTotalPengeluaranMonth] = useState(0);
+  const [totalKeuntunganDay, setTotalKeuntunganDay] = useState(0);
+  const [totalKeuntunganMonth, setTotalKeuntunganMonth] = useState(0);
 
   function formatIDR(amount) {
     const formatter = new Intl.NumberFormat("id-ID", {
@@ -172,6 +176,8 @@ export const Recap = () => {
         }
       );
       setTotalCurrentMonth(response.data.total_current_month);
+
+
       const responseCurrentToday = await axios.post(
         `${apiUrl}/api/pendapatan/show_pendapatan_harian_pembayaran`,
         formData,
@@ -182,6 +188,49 @@ export const Recap = () => {
         }
       );
       setTotalCurrentDay(responseCurrentToday.data.total_today);
+
+      const responsePengeluaranToday = await axios.post(
+        `${apiUrl}/api/pendapatan/show_pengeluaran_harian_jenis`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalPengeluaranDay(responsePengeluaranToday.data.total_pengeluaran_today);
+
+      const responsePengeluaranMonth = await axios.post(
+        `${apiUrl}/api/pendapatan/show_pengeluaran_bulanan_jenis`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalPengeluaranMonth(responsePengeluaranMonth.data.total_pengeluaran_current_month);
+
+      const responseKeuntunganDay = await axios.post(
+        `${apiUrl}/api/pendapatan/show_keuntungan_harian_jenis`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalKeuntunganDay(responseKeuntunganDay.data.total_keuntungan_bersih_current_day);
+      const responseKeuntunganMonth = await axios.post(
+        `${apiUrl}/api/pendapatan/show_keuntungan_bulanan_jenis`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setTotalKeuntunganMonth(responseKeuntunganMonth.data.total_keuntungan_bersih_current_month);
 
 
       // Optionally, refresh the dataSavedBill list or remove the deleted item from the state
@@ -334,7 +383,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0">
-                        {formatIDR(datsaPengeluaranHarian)}
+                        {formatIDR(totalPengeluaranDay)}
                       </h3>
                       {/* <p className="text-success ml-2 mb-0 font-weight-medium">
                         +11%
@@ -365,7 +414,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0" style={{ color: "yellow" }}>
-                        {formatIDR(datsaKeuntunganHarian)}
+                        {formatIDR(totalKeuntunganDay)}
                       </h3>
                       {/* <p
                         className="text-danger ml-2 mb-0 font-weight-medium"
@@ -439,7 +488,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0" style={{ color: "#ff0000" }}>
-                        {formatIDR(datsaPengeluaranBulanan)}
+                        {formatIDR(totalPengeluaranMonth)}
                       </h3>
                       {/* <p
                         className="text-success ml-2 mb-0 font-weight-medium"
@@ -474,7 +523,7 @@ export const Recap = () => {
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
                       <h3 className="mb-0" style={{ color: "yellow" }}>
-                        {formatIDR(datsaKeuntunganBulanan)}
+                        {formatIDR(totalKeuntunganMonth)}
                       </h3>
                     </div>
                   </div>

@@ -1,21 +1,21 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
-import axios from 'axios';
-import { BACKEND } from '../../constants'; // Adjust the import according to your project structure
+import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
+import { Form, Button } from "react-bootstrap";
+import axios from "axios";
+import { BACKEND } from "../../constants";
 import Cookies from "js-cookie";
 
 export class Login extends Component {
   state = {
-    username: '',
-    password: '',
+    username: "",
+    password: "",
     isAuthenticated: false,
-    errorMessage: '',
+    errorMessage: "",
+    loading: false,
   };
 
   componentDidMount() {
-    // Check if Authorization cookie exists on component mount
-    const authToken = Cookies.get('Authorization');
+    const authToken = Cookies.get("Authorization");
     if (authToken) {
       this.setState({ isAuthenticated: true });
     }
@@ -29,7 +29,9 @@ export class Login extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     const { username, password } = this.state;
-    const apiUrl = BACKEND; // Your backend URL
+    const apiUrl = BACKEND;
+
+    this.setState({ loading: true, errorMessage: "" });
 
     try {
       const response = await axios.post(
@@ -37,57 +39,21 @@ export class Login extends Component {
         { username, password },
         { withCredentials: true }
       );
+
       if (response.status === 200) {
         const authToken = response.data.data.token;
-        Cookies.set('Authorization', authToken, { expires: 1, path: '' });
-        this.setState({ isAuthenticated: true });        
-      }
-    } catch (error) {
-      console.error('Error logging in:', error);
-      this.setState({ errorMessage: 'Invalid username or password' });
-    }
-  };
-
-  // Function to check authentication status with backend
-  checkAuthentication = async (authToken) => {
-    console.log('check auth login')
-    const apiUrl = BACKEND; // Your backend URL
-
-    try {
-      
-      const response = await axios.post(
-        `${apiUrl}/api/auth/check-auth`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          withCredentials: true,
-        }
-      );      
-      if (response.data.status==1) {
+        Cookies.set("Authorization", authToken, { expires: 1, path: '/', secure: true, sameSite: 'Lax' });
         this.setState({ isAuthenticated: true });
-      } else {
-        this.setState({ isAuthenticated: false });
-        // Clear the Authorization cookie and reset state for login retry
-        Cookies.remove('Authorization');
-        console.log("remove cookis login.js")
-
+        this.props.onLoginSuccess();
       }
     } catch (error) {
-      console.error('Error checking authentication:', error);
-      this.setState({ isAuthenticated: false });
-      // Clear the Authorization cookie and reset state for login retry
-      Cookies.remove('Authorization');
-      console.log("remove cookis login.js errir")
-
+      this.setState({ errorMessage: "Invalid username or password", loading: false });
     }
   };
 
   render() {
-    const { username, password, isAuthenticated, errorMessage } = this.state;
+    const { username, password, isAuthenticated, errorMessage, loading } = this.state;
 
-    // Redirect to dashboard if authenticated
     if (isAuthenticated) {
       return <Redirect to="/dashboard" />;
     }
@@ -113,6 +79,7 @@ export class Login extends Component {
                       name="username"
                       value={username}
                       onChange={this.handleInputChange}
+                      required
                     />
                   </Form.Group>
                   <Form.Group className="d-flex search-field">
@@ -124,6 +91,7 @@ export class Login extends Component {
                       name="password"
                       value={password}
                       onChange={this.handleInputChange}
+                      required
                     />
                   </Form.Group>
                   {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
@@ -131,8 +99,9 @@ export class Login extends Component {
                     <Button
                       className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
                       type="submit"
+                      disabled={loading}
                     >
-                      SIGN IN
+                      {loading ? "Signing In..." : "SIGN IN"}
                     </Button>
                   </div>
                 </Form>
