@@ -42,7 +42,7 @@ export class Login extends Component {
 
       if (response.status === 200) {
         const authToken = response.data.data.token;
-        Cookies.set("Authorization", authToken, { expires: 1, path: '/', secure: true, sameSite: 'Lax' });
+        Cookies.set("Authorization", authToken, { expires: 1, path: '/', secure: true, sameSite: 'None' });
         this.setState({ isAuthenticated: true });
         this.props.onLoginSuccess();
       }
