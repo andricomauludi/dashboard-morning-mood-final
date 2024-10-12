@@ -43,14 +43,9 @@ export class Login extends Component {
       if (response.status === 200) {
         const authToken = response.data.data.token;
         console.log("Token yang diterima:", authToken); // Log token
-        Cookies.set("Authorization", authToken, {
-          expires: 1,
-          path: "/",
-          secure: true,
-          sameSite: "None",
-        });
+        Cookies.set('Authorization', authToken, { expires: 1, path: '/' });
         this.setState({ isAuthenticated: true });
-        // this.props.onLoginSuccess();
+        this.props.onLoginSuccess();
       }
     } catch (error) {
       console.error("Error saat login:", error);
