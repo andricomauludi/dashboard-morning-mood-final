@@ -66,7 +66,10 @@ export class Login extends Component {
 
     return (
       <div>
-        <div className="d-flex align-items-center auth px-0">
+        <div className="d-flex align-items-center auth px-0"    style={{
+    background: 'linear-gradient(to bottom, rgba(128, 0, 128, 0.4) 0%, rgba(0, 0, 0, 1) 100%)', // Increased opacity for a lighter purple
+    height: '100vh', // Cover full height
+  }}>
           <div className="row w-100 mx-0">
             <div className="col-lg-4 mx-auto">
               <div className="card text-center py-5 px-4 px-sm-5">
@@ -108,7 +111,7 @@ export class Login extends Component {
                   )}
                   <div className="mt-3">
                     <Button
-                      className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
+                      className="btn btn-block btn-warning btn-lg font-weight-medium auth-form-btn"
                       type="submit"
                       disabled={loading}
                     >

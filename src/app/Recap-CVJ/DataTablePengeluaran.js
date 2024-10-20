@@ -12,7 +12,12 @@ import { BACKEND } from "../../constants";
 import axios from "axios";
 import ModalEditPengeluaran from "./ModalEditPengeluaran";
 
-const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) => {
+const DatatablePengeluaran = ({
+  columns,
+  data,
+  fetchData,
+  fetchAllKeuntungan,
+}) => {
   const apiUrl = BACKEND;
 
   const [searchInput, setSearchInput] = useState("");
@@ -29,7 +34,7 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
     harga_pengeluaran: 0,
     jumlah_barang: 0,
     satuan: "",
-    total_pengeluaran: 0,  
+    total_pengeluaran: 0,
   });
 
   const today = new Date();
@@ -93,7 +98,7 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
   const handleEditSave = () => {
     setLoadingModal(true);
     const fetchDataEdit = async () => {
-      try {        
+      try {
         const response = await axios.put(
           apiUrl + `/api/transaction/edit_pengeluaran/${pengeluaranToEdit.id}`,
           pengeluaranToEdit,
@@ -106,7 +111,7 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
         setLoadingModal(false);
         setEditModal(false);
         fetchData(); // Reload the data after save
-        fetchAllKeuntungan()
+        fetchAllKeuntungan();
         // Optionally, update the table data here if needed
       } catch (error) {
         console.error("Error saving edited bill:", error);
@@ -173,8 +178,8 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
   const transformedData = useMemo(
     () =>
       filteredData.map((row) => ({
-        ...row,        
-        waktuPengeluaran: `${formatDate(row.WaktuPengeluaran)}`,        
+        ...row,
+        waktuPengeluaran: `${formatDate(row.WaktuPengeluaran)}`,
         hargaPengeluaran: `${formatPrice(row.harga_pengeluaran)}`,
         totalPengeluaran: `${formatPrice(row.total_pengeluaran)}`,
         // jenisPengeluaran: row.jenis_pengeluaran === "1" ? "sudah bayar" : "belum bayar",
@@ -195,7 +200,7 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
             <div className="col-md-6">
               <a>
                 {console.log(row)}
-              <button
+                <button
                   className="btn btn-outline-info"
                   onClick={() =>
                     handleShowEditModal({
@@ -206,12 +211,12 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
                       harga_pengeluaran: row.harga_pengeluaran,
                       jumlah_barang: row.jumlah_barang,
                       satuan: row.satuan,
-                      total_pengeluaran: row.total_pengeluaran,                    
+                      total_pengeluaran: row.total_pengeluaran,
                     })
                   }
                 >
                   <i className="mdi mdi-table-edit"></i>
-                </button>              
+                </button>
               </a>
             </div>
           </div>
@@ -326,90 +331,96 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
       </div>
       <div>
         <div className="row mt-3 d-flex justify-content-center">
-          <div className="col-md-4">
+          <div className="col-lg-4 col-md-4 col-sm-12">
             <input
               className="form-control text-white"
               value={searchInput}
               onChange={handleSearchChange}
-              placeholder={"Search..."}
+              placeholder={"Cari..."}
               style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
             />
           </div>
-          <div className="col-md-4">
-            <div className="row">
-              <div className="col-md-6">
-                <div className="row form-inline">
-                  <span>
-                    Go to page:{" "}
-                    <input
-                      className="form-control"
-                      type="number"
-                      defaultValue={pageIndex + 1}
-                      onChange={(e) => {
-                        const page = e.target.value
-                          ? Number(e.target.value) - 1
-                          : 0;
-                        gotoPage(page);
-                      }}
-                      style={{ width: "100px" }}
-                    />
-                  </span>{" "}
-                </div>
+          <div className="col-lg-4 col-md-4 col-sm-12">
+            <div className="row form-inline">
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <span>Ke halaman : </span>{" "}
               </div>
-              <div className="col-md-4">
-                <select
-                  className="form-control text-white"
-                  value={pageSize}
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <input
+                  className="form-control"
+                  type="number"
+                  defaultValue={pageIndex + 1}
                   onChange={(e) => {
-                    setPageSize(Number(e.target.value));
+                    const page = e.target.value
+                      ? Number(e.target.value) - 1
+                      : 0;
+                    gotoPage(page);
                   }}
-                >
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <option key={pageSize} value={pageSize}>
-                      Show {pageSize}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
           </div>
+          <div className="col-lg-4 col-md-4 col-sm-12">
+            <select
+              className="form-control text-white"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+              }}
+            >
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize} data
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="row mt-3 d-flex justify-content-center">
-          <button
-            className="btn btn-inverse-warning btn-lg"
-            onClick={() => gotoPage(0)}
-            disabled={!canPreviousPage}
-          >
-            {"<<"}
-          </button>
-          <button
-            className="btn btn-inverse-warning btn-lg"
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-          >
-            {"<"}
-          </button>
-          <button
-            className="btn btn-inverse-warning btn-lg"
-            onClick={() => nextPage()}
-            disabled={!canNextPage}
-          >
-            {">"}
-          </button>
-          <button
-            className="btn btn-inverse-warning btn-lg"
-            onClick={() => gotoPage(pageCount - 1)}
-            disabled={!canNextPage}
-          >
-            {">>"}
-          </button>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => gotoPage(0)}
+              disabled={!canPreviousPage}
+            >
+              {"<<"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+            >
+              {"<"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+            >
+              {">"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => gotoPage(pageCount - 1)}
+              disabled={!canNextPage}
+            >
+              {">>"}
+            </button>
+          </div>
         </div>
         <div className="row mt-3 mb-3 d-flex justify-content-center">
           <span>
-            Page
+            Halaman ke
             <strong style={{ marginLeft: "5px" }}>
-              {pageIndex + 1} of {pageOptions.length}
+              {pageIndex + 1} dari {pageOptions.length}
             </strong>
+            &nbsp;Halaman
           </span>
         </div>
         <div className="row mt-3 mb-3 d-flex justify-content-center">
@@ -458,12 +469,11 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
               <React.Fragment key={row.id}>
                 <tr {...row.getRowProps()}>
                   {row.cells.map((cell) => {
-                 
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
                     );
                   })}
-                </tr>               
+                </tr>
               </React.Fragment>
             );
           })}
@@ -477,14 +487,14 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
         fetchData={fetchData}
         fetchAllKeuntungan={fetchAllKeuntungan}
       />
-        <ModalEditPengeluaran
+      <ModalEditPengeluaran
         show={editModal}
         handleClose={handleCloseEditModal}
         bill={pengeluaranToEdit}
         handleSave={handleEditSave}
         handleChange={handleEditChange}
       />
-       <Modal
+      <Modal
         show={loadingModal}
         onHide={() => {}}
         backdrop="static"
@@ -496,7 +506,7 @@ const DatatablePengeluaran = ({ columns, data, fetchData, fetchAllKeuntungan }) 
             <ProgressBar animated now={100} />
           </div>
         </Modal.Body>
-      </Modal>    
+      </Modal>
     </>
   );
 };

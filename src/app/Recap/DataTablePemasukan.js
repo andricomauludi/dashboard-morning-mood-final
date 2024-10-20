@@ -12,7 +12,7 @@ import axios from "axios";
 import { BACKEND } from "../../constants";
 import { Button, Modal, ProgressBar } from "react-bootstrap";
 
-const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
+const Table = ({ columns, data, fetchData, fetchAllKeuntungan }) => {
   const apiUrl = BACKEND;
   const [searchInput, setSearchInput] = useState("");
   const [deleteModal, setDeleteModal] = useState(false);
@@ -88,7 +88,7 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
   const handleEditSave = () => {
     setLoadingModal(true);
     const fetchDataEdit = async () => {
-      try {        
+      try {
         const response = await axios.put(
           apiUrl + `/api/transaction/edit_bill/${billToEdit.id}`,
           billToEdit,
@@ -161,23 +161,23 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
 
   const filteredData = useMemo(() => {
     if (!data || data.length === 0) return [];
-  
+
     if (!selectedYear && !selectedMonth && !selectedDay) return data;
-  
+
     return data.filter((row) => {
       const date = new Date(row.Bill.Timestamp);
       const year = date.getFullYear().toString();
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const day = date.getDate().toString().padStart(2, "0");
-  
+
       const yearMatches = selectedYear ? year === selectedYear : true;
       const monthMatches = selectedMonth ? month === selectedMonth : true;
-      const dayMatches = selectedDay === "Semua Hari" ? true : day === selectedDay;
-  
+      const dayMatches =
+        selectedDay === "Semua Hari" ? true : day === selectedDay;
+
       return yearMatches && monthMatches && dayMatches;
     });
   }, [data, selectedYear, selectedMonth, selectedDay]);
-  
 
   const transformedData = useMemo(
     () =>
@@ -328,7 +328,7 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
       </div>
       <div>
         <div className="row mt-3 d-flex justify-content-center">
-          <div className="col-md-4">
+          <div className="col-lg-4 col-md-4 col-sm-12">
             <input
               className="form-control text-white"
               value={searchInput}
@@ -337,80 +337,85 @@ const Table = ({ columns, data, fetchData,fetchAllKeuntungan }) => {
               style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
             />
           </div>
-          <div className="col-md-4">
-            <div className="row">
-              <div className="col-md-6">
-                <div className="row form-inline">
-                  <span>
-                    Ke halaman :{" "}
-                    <input
-                      className="form-control"
-                      type="number"
-                      defaultValue={pageIndex + 1}
-                      onChange={(e) => {
-                        const page = e.target.value
-                          ? Number(e.target.value) - 1
-                          : 0;
-                        gotoPage(page);
-                      }}
-                      style={{ width: "100px" }}
-                    />
-                  </span>{" "}
-                </div>
+          <div className="col-lg-4 col-md-4 col-sm-12">
+            <div className="row form-inline">
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <span>Ke halaman : </span>{" "}
               </div>
-              <div className="col-md-4">
-                <select
-                  className="form-control text-white"
-                  value={pageSize}
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <input
+                  className="form-control"
+                  type="number"
+                  defaultValue={pageIndex + 1}
                   onChange={(e) => {
-                    setPageSize(Number(e.target.value));
+                    const page = e.target.value
+                      ? Number(e.target.value) - 1
+                      : 0;
+                    gotoPage(page);
                   }}
-                >
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <option key={pageSize} value={pageSize}>
-                      {pageSize} data
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
           </div>
+          <div className="col-lg-4 col-md-4 col-sm-12">
+            <select
+              className="form-control text-white"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+              }}
+            >
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize} data
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
         <div className="row mt-3 d-flex justify-content-center">
-          <button
-            className="btn btn-warning btn-lg"
-            onClick={() => gotoPage(0)}
-            disabled={!canPreviousPage}
-          >
-            {"<<"}
-          </button>
-          <button
-            className="btn btn-warning btn-lg"
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-          >
-            {"<"}
-          </button>
-          <button
-            className="btn btn-warning btn-lg"
-            onClick={() => nextPage()}
-            disabled={!canNextPage}
-          >
-            {">"}
-          </button>
-          <button
-            className="btn btn-warning btn-lg"
-            onClick={() => gotoPage(pageCount - 1)}
-            disabled={!canNextPage}
-          >
-            {">>"}
-          </button>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => gotoPage(0)}
+              disabled={!canPreviousPage}
+            >
+              {"<<"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => previousPage()}
+              disabled={!canPreviousPage}
+            >
+              {"<"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => nextPage()}
+              disabled={!canNextPage}
+            >
+              {">"}
+            </button>
+          </div>
+          <div className="col-lg-3 col-md-3 col-sm-1">
+            <button
+              className="btn btn-warning btn-block"
+              onClick={() => gotoPage(pageCount - 1)}
+              disabled={!canNextPage}
+            >
+              {">>"}
+            </button>
+          </div>
         </div>
         <div className="row mt-3 mb-3 d-flex justify-content-center">
           <span>
             Halaman ke
             <strong style={{ marginLeft: "5px" }}>
-              {pageIndex + 1} dari {pageOptions.length} 
+              {pageIndex + 1} dari {pageOptions.length}
             </strong>
             &nbsp;Halaman
           </span>

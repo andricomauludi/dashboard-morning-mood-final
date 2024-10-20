@@ -13,10 +13,10 @@ import axios from "axios";
 class App extends Component {
   state = {
     isAuthenticated: false,
-    userRole: null,  // Store user role
-    userUsername : null,
+    userRole: null, // Store user role
+    userUsername: null,
     isFullPageLayout: false,
-    isSidebarOpen: true,  // Track sidebar visibility
+    isSidebarOpen: true, // Track sidebar visibility
   };
   toggleSidebar = () => {
     this.setState((prevState) => ({
@@ -36,10 +36,10 @@ class App extends Component {
     }
   }
 
-   // Triggered after successful login
-   handleLoginSuccess = () => {
+  // Triggered after successful login
+  handleLoginSuccess = () => {
     console.log("Login successful, checking authentication and roles again...");
-    this.checkAuthentication();  // Re-check authentication and role
+    this.checkAuthentication(); // Re-check authentication and role
     this.checkRole();
   };
 
@@ -62,7 +62,7 @@ class App extends Component {
           }
         );
         if (response.data.status === 1) {
-          this.setState({ isAuthenticated: true });          
+          this.setState({ isAuthenticated: true });
         } else {
           this.setState({ isAuthenticated: false });
           Cookies.remove("Authorization"); // Hapus hanya jika token tidak valid
@@ -95,7 +95,7 @@ class App extends Component {
           }
         );
         if (response.data.status === 1) {
-          console.log("role ="+response.data);
+          console.log("role =" + response.data);
           this.setState({
             isAuthenticated: true,
             userRole: response.data.role,
@@ -159,15 +159,27 @@ class App extends Component {
       }
     });
   };
-  
 
   render() {
     const { isAuthenticated, userRole, isFullPageLayout } = this.state;
-    {console.log("userRole dari app js = "+this.state.userRole)}
+    {
+      console.log("userRole dari app js = " + this.state.userRole);
+    }
 
-    let navbarComponent = !this.state.isFullPageLayout ? <Navbar userRole={this.state.userRole}  userUsername={this.state.userUsername}/> : "";
+    let navbarComponent = !this.state.isFullPageLayout ? (
+      <Navbar
+        userRole={this.state.userRole}
+        userUsername={this.state.userUsername}
+      />
+    ) : (
+      ""
+    );
     let sidebarComponent = !this.state.isFullPageLayout ? (
-      <Sidebar toggleSidebar={this.toggleSidebar} userRole={this.state.userRole} userUsername={this.state.userUsername} />
+      <Sidebar
+        toggleSidebar={this.toggleSidebar}
+        userRole={this.state.userRole}
+        userUsername={this.state.userUsername}
+      />
     ) : (
       ""
     );
@@ -175,6 +187,10 @@ class App extends Component {
     let mainContentClass = this.state.isSidebarClosed
       ? "main-content-expanded"
       : "main-content";
+
+    if (this.props.location.pathname === "/user-pages/login-1") {
+      mainContentClass = "main-content-no-margin-left"; // Apply no margin class
+    }
     return (
       <div className="container-scroller">
         {sidebarComponent}

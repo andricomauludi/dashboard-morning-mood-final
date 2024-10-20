@@ -71,6 +71,11 @@ body {
   transition: width 0.3s;
   margin-left: 240px;
 }
+.main-content-no-margin-left {
+  margin-left: 0 !important; /* Removes left margin */
+  width: 100%; /* Adjust width if needed */
+}
+
 
 .content-wrapper {
   background: $content-bg;
