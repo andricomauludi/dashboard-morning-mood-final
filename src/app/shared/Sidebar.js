@@ -2,17 +2,68 @@ import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Collapse, Dropdown } from "react-bootstrap";
 import { Trans } from "react-i18next";
+import { BACKEND } from "../../constants";
+import axios from "axios";
+import Cookies from "js-cookie";
+
 import Spinner from "../shared/Spinner";
 import ImageModal from "./ImageModal"; // Import the modal component
+import ModalConfirmation from "./ModalConfirmation";
+import LogoutModal from "./LogoutModal";
 
 class Sidebar extends Component {
   state = {
     showModal: false,
+    showModalLogout: false,
     currentImageSrc: "",
   };
 
   handleImageClick = (imgSrc) => {
     this.setState({ currentImageSrc: imgSrc, showModal: true });
+  };
+  toggleModal = () => {
+    this.setState((prevState) => ({
+      showModalLogout: !prevState.showModalLogout,
+    }));
+  };
+  handleLogout = async (event) => {
+    event.preventDefault();
+
+    try {
+      // Get the Authorization token from cookies
+      const token = Cookies.get("Authorization");
+      if (!token) {
+        console.error("Authorization cookie not found");
+        return;
+      }
+
+      const apiUrl = BACKEND; // Your backend URL
+
+      // Send a POST request to logout endpoint with Authorization header
+      const response = await axios.post(
+        `${apiUrl}/api/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      // Check if the logout request was successful
+      if (response.status === 200) {
+        // Remove the Authorization cookie
+        Cookies.remove("Authorization", { path: "/" });
+
+        // Redirect to the login page
+        this.props.history.push("/user-pages/login-1"); // Ensure this.props.history is available
+      } else {
+        console.error("Failed to log out:", response.status);
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   handleCloseModal = () => {
@@ -83,7 +134,7 @@ class Sidebar extends Component {
         : require("../../assets/images/faces/profile-default.jpg");
 
     return (
-      <nav className="sidebar sidebar-offcanvas" id="sidebar">
+      <nav className="sidebar" id="sidebar">
         <div className="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
           <a
             className="sidebar-brand brand-logo"
@@ -258,6 +309,16 @@ class Sidebar extends Component {
               </span>
             </Link>
           </li>
+          <li className="nav-item menu-items">
+            <Link className="nav-link" onClick={this.toggleModal}>
+                <span className="menu-icon">
+                  <i className="mdi mdi-logout danger"></i>
+                </span>
+                <span className="menu-title danger" >
+                  <Trans>Logout</Trans>
+                </span>
+            </Link>
+          </li>
         </ul>
         {showModal && (
           <ImageModal
@@ -265,6 +326,12 @@ class Sidebar extends Component {
             onClose={this.handleCloseModal} // Kirim fungsi untuk menutup modal
           />
         )}
+        {/* Confirmation Modal */}
+        <LogoutModal
+          show={this.state.showModalLogout}
+          handleClose={this.toggleModal}
+          handleConfirm={this.handleLogout} // Call handleLogout on confirm
+        />
       </nav>
     );
   }

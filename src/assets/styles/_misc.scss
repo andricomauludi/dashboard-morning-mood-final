@@ -22,7 +22,9 @@ body {
   padding-left: 0;
   padding-right: 0;
   width: calc(100% - #{$sidebar-width-lg});
-  transition: width $action-transition-duration $action-transition-timing-function, margin $action-transition-duration $action-transition-timing-function;
+  transition: width $action-transition-duration
+      $action-transition-timing-function,
+    margin $action-transition-duration $action-transition-timing-function;
 
   &.full-page-wrapper {
     min-height: 100vh;
@@ -48,7 +50,9 @@ body {
 }
 
 .main-panel {
-  transition: width $action-transition-duration $action-transition-timing-function, margin $action-transition-duration $action-transition-timing-function;
+  transition: width $action-transition-duration
+      $action-transition-timing-function,
+    margin $action-transition-duration $action-transition-timing-function;
   width: 100%;
   min-height: calc(100vh - #{$navbar-height});
   padding-top: $navbar-height;
@@ -83,11 +87,13 @@ body {
   &.sidebar-closed {
     .page-body-wrapper {
       width: 100%;
-      transition: width $action-transition-duration $action-transition-timing-function;
+      transition: width $action-transition-duration
+        $action-transition-timing-function;
     }
     .main-panel {
       width: 100%;
-      transition: width $action-transition-duration $action-transition-timing-function;
+      transition: width $action-transition-duration
+        $action-transition-timing-function;
     }
   }
 }
@@ -130,27 +136,94 @@ code {
     text-align: center;
     box-shadow: 0px 3px 8.3px 0.7px rgba(163, 93, 255, 0.35);
     i {
-      font-size: .9375rem;
+      font-size: 0.9375rem;
       line-height: 36px;
     }
   }
 }
 .floating-card-container {
-  position: fixed;
-  right: 0;
-  top: 25px; // Adjust as needed
-  bottom:  $navbar-height;
-  margin-top: $navbar-height;  
-  width: 400px; // Adjust as needed
-  z-index: 1000;
+  @media (min-width: 900px) {
+    position: fixed;
+    right: 0;
+    top: 25px; // Adjust as needed
+    bottom: $navbar-height;
+    margin-top: $navbar-height;
+    width: 400px; // Adjust as needed
+    z-index: 1000;
+  }
 }
 
 .floating-card {
   max-height: calc(100vh - 100px); // Adjust as needed for your layout
   overflow-y: auto;
+
+  .card-body {
+    height: 100%; // Ensure full height for proper scrolling
+  }
+}
+.fixed-size-image-container {
+  width: 130px; /* Set a fixed width */
+  height: 130px; /* Set a fixed height */
+  position: relative;
+  overflow: hidden;
 }
 
-.floating-card .card-body {
-  height: 100%; // Ensure full height for proper scrolling
+.fixed-size-image {
+  display: block;
+  width: 100%; /* Ensure it fills the container */
+  height: 100%; /* Ensure it fills the container */
+  object-fit: cover; /* Maintain aspect ratio, crop if necessary */
 }
+@media screen and (max-width: 1340px) {
+  .fixed-size-image-container {
+    width: 100px; /* Set a fixed width */
+    height: 100px; /* Set a fixed height */
+    position: relative;
+    overflow: hidden;
+  }
+}
+@media screen and (max-width: 770px) {
+  .fixed-size-image-container {
+    width: 200px; /* Set a fixed width */
+    height: 200px; /* Set a fixed height */
+    position: relative;
+    overflow: hidden;
+  }
+}
+@media screen and (max-width: 638px) {
+  .fixed-size-image-container {
+    width: 150px; /* Set a fixed width */
+    height: 150px; /* Set a fixed height */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scroll-to-top {
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* Distance from the bottom */
+    right: 20px; /* Distance from the right */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 50%; /* Make it circular */
+    width: 50px; /* Fixed width for circular shape */
+    height: 50px; /* Fixed height for circular shape */
+    display: flex; /* Flexbox for centering */
+    justify-content: center; /* Centering */
+    align-items: center; /* Centering */
+    font-size: 20px; /* Font size for the arrow */
+    cursor: pointer; /* Cursor change on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    transition: background-color 0.3s ease; /* Transition effect */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+}
+@media screen and (max-width: 500px) {
+  .fixed-size-image-container {
+    width: 50px; /* Set a fixed width */
+    height: 50px; /* Set a fixed height */
+    position: relative;
+    overflow: hidden;
+  }
+}
+
 

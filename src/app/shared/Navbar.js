@@ -420,14 +420,7 @@ class Navbar extends Component {
               </Dropdown.Menu>
             </Dropdown>
           </ul>
-          <button
-            className="navbar-toggler navbar-toggler-right d-lg-none align-self-center"
-            type="button"
-            onClick={this.toggleOffcanvas}
-          >
-            mantab
-            <span className="mdi mdi-format-line-spacing"></span>
-          </button>
+         
         </div>
         {showModal && (
           <ImageModal

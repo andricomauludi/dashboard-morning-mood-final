@@ -231,7 +231,7 @@ export const PointOfSales = () => {
       );
 
       const billId = billResponse.data.data.id;
-      setDataReceiptBill(billResponse.data.data);      
+      setDataReceiptBill(billResponse.data.data);
       // Include other necessary data for detail_bill here
       const modifiedSelectedImages2 = modifiedSelectedImages.map((image) => ({
         ...image,
@@ -400,6 +400,13 @@ export const PointOfSales = () => {
     return cash && cash >= totalAmount ? "text-success" : "text-danger";
   };
 
+  const [visible, setVisible] = useState(false);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -474,7 +481,20 @@ export const PointOfSales = () => {
     fetchData3();
     fetchData4();
     fetchData5();
-    return;
+    // Scroll to top button functionality
+    // Scroll to top button functionality
+    const handleScroll = () => {
+      if (window.scrollY > 100) {        
+        setVisible(true);
+      } else {
+        setVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
     // dispatch(getSandwichLists());
   }, []);
 
@@ -675,6 +695,7 @@ export const PointOfSales = () => {
       <div>
         <div className="page-header">
           <h3 className="page-title"> Kasir </h3>
+
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
               <li className="breadcrumb-item">
@@ -687,222 +708,6 @@ export const PointOfSales = () => {
           </nav>
         </div>
         <div className="row">
-          <div className="col-md-8 grid-margin stretch-card">
-            <div className="card">
-              <div className="card-body">
-                <div className="card">
-                  <div className="card-body">
-                    <Slider className="portfolio-slider" {...sliderSettings}>
-                      <div className="item">
-                        <h4 key="makanan" className="card-title">
-                          Makanan
-                        </h4>
-                        <div className="row">
-                          {datas.map((row, index) => (
-                            <div className="col-sm-6 col-md-4 col-lg-3">
-                              <div className="row justify-content-center">
-                                <div
-                                  style={{
-                                    height: 150,
-                                    width: 150,
-                                    position: "relative",
-                                    overflow: "hidden",
-                                  }}
-                                >
-                                  <Image
-                                    src={`data:image/jpeg;base64,${row.photo}`}
-                                    alt={`${row.nama_menu}`}
-                                    style={{
-                                      display: "block",
-                                      width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                    }}
-                                    onClick={() => handleImageClick(row)}
-                                    layout="fill"
-                                  />
-                                </div>
-                              </div>
-                              <div className="row justify-content-center text-center m-3">
-                                <h6>{row.nama_menu}</h6>
-                              </div>
-                              <div className="row justify-content-center text-center m-3">
-                                <h6>{formatPrice(row.harga)}</h6>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="item">
-                        <h4 key="minuman" className="card-title">
-                          Minuman
-                        </h4>
-                        <div className="row">
-                          {datas2.map((row, index) => (
-                            <>
-                              <div className="col-sm-6 col-md-4 col-lg-3">
-                                <div className="row justify-content-center">
-                                  <div
-                                    style={{
-                                      height: 150,
-                                      width: 150,
-                                      position: "relative",
-                                      overflow: "hidden",
-                                    }}
-                                  >
-                                    <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
-                                      alt={`${row.nama_menu}`}
-                                      style={{
-                                        display: "block",
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                      }}
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{row.nama_menu}</h6>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{formatPrice(row.harga)}</h6>
-                                </div>
-                              </div>
-                            </>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="item">
-                        <h4 key="cemilan" className="card-title">
-                          Cemilan
-                        </h4>
-                        <div className="row">
-                          {datas3.map((row, index) => (
-                            <>
-                              <div className="col-sm-6 col-md-4 col-lg-3">
-                                <div className="row justify-content-center">
-                                  <div
-                                    style={{
-                                      height: 150,
-                                      width: 150,
-                                      position: "relative",
-                                      overflow: "hidden",
-                                    }}
-                                  >
-                                    <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
-                                      alt={`${row.nama_menu}`}
-                                      style={{
-                                        display: "block",
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                      }}
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{row.nama_menu}</h6>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{formatPrice(row.harga)}</h6>
-                                </div>
-                              </div>
-                            </>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="item">
-                        <h4 key="barbershop" className="card-title">
-                          Barbershop
-                        </h4>
-                        <div className="row">
-                          {datas4.map((row, index) => (
-                            <>
-                              <div className="col-sm-6 col-md-4 col-lg-3">
-                                <div className="row justify-content-center">
-                                  <div
-                                    style={{
-                                      height: 150,
-                                      width: 150,
-                                      position: "relative",
-                                      overflow: "hidden",
-                                    }}
-                                  >
-                                    <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
-                                      alt={`${row.nama_menu}`}
-                                      style={{
-                                        display: "block",
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                      }}
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{row.nama_menu}</h6>
-                                </div>
-                                <div className="row justify-content-center text-center m-3">
-                                  <h6>{formatPrice(row.harga)}</h6>
-                                </div>
-                              </div>
-                            </>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="item">
-                        <h4 className="card-title">Custom</h4>
-                        <div className="row">
-                          <>
-                            <div className="col-sm-6 col-md-4 col-lg-3">
-                              <div className="row justify-content-center">
-                                <div
-                                  style={{
-                                    height: 150,
-                                    width: 150,
-                                    position: "relative",
-                                    overflow: "hidden",
-                                  }}
-                                >
-                                  <Image
-                                    src={require("../../assets/images/custom-photo.png")}
-                                    alt={`custom`}
-                                    style={{
-                                      display: "block",
-                                      width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                    }}
-                                    onClick={() => handleShowCustomModal()}
-                                    layout="fill"
-                                  />
-                                </div>
-                              </div>
-                              <div className="row justify-content-center text-center m-3">
-                                <h6>Klik di sini untuk kustom menu</h6>
-                              </div>
-                              {/* <div className="row justify-content-center text-center m-3">
-                                  <h6>{formatPrice(row.harga)}</h6>
-                                </div> */}
-                            </div>
-                          </>
-                        </div>
-                      </div>
-                    </Slider>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="col-md-8 grid-margin stretch-card floating-card-container">
             <div className="card floating-card">
               <div className="card-body">
@@ -987,6 +792,169 @@ export const PointOfSales = () => {
                   >
                     Save Bill
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-8 grid-margin stretch-card">
+            <div className="card">
+              <div className="card-body">
+                <div className="card">
+                  <div className="card-body">
+                    <Slider className="portfolio-slider" {...sliderSettings}>
+                      <div className="item">
+                        <h4 key="makanan" className="card-title">
+                          Makanan
+                        </h4>
+                        <div className="row">
+                          {datas.map((row, index) => (
+                            <div className="col-sm-6 col-md-4 col-lg-3">
+                              <div className="row justify-content-center">
+                                <div className="item fixed-size-image-container">
+                                  <Image
+                                    src={`data:image/jpeg;base64,${row.photo}`}
+                                    alt={`${row.nama_menu}`}
+                                    className="fixed-size-image"
+                                    onClick={() => handleImageClick(row)}
+                                    layout="fill"
+                                  />
+                                </div>
+                              </div>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>{row.nama_menu}</h6>
+                              </div>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>{formatPrice(row.harga)}</h6>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 key="minuman" className="card-title">
+                          Minuman
+                        </h4>
+                        <div className="row">
+                          {datas2.map((row, index) => (
+                            <>
+                              <div className="col-sm-6 col-md-4 col-lg-3">
+                                <div className="row justify-content-center">
+                                  <div className="item fixed-size-image-container">
+                                    <Image
+                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      alt={`${row.nama_menu}`}
+                                      className="fixed-size-image"
+                                      onClick={() => handleImageClick(row)}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div>
+                              </div>
+                            </>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 key="cemilan" className="card-title">
+                          Cemilan
+                        </h4>
+                        <div className="row">
+                          {datas3.map((row, index) => (
+                            <>
+                              <div className="col-sm-6 col-md-4 col-lg-3">
+                                <div className="row justify-content-center">
+                                  <div className="item fixed-size-image-container">
+                                    <Image
+                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      alt={`${row.nama_menu}`}
+                                      className="fixed-size-image"
+                                      onClick={() => handleImageClick(row)}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div>
+                              </div>
+                            </>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 key="barbershop" className="card-title">
+                          Barbershop
+                        </h4>
+                        <div className="row">
+                          {datas4.map((row, index) => (
+                            <>
+                              <div className="col-sm-6 col-md-4 col-lg-3">
+                                <div className="row justify-content-center">
+                                  <div className="item fixed-size-image-container">
+                                    <Image
+                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      alt={`${row.nama_menu}`}
+                                      className="fixed-size-image"
+                                      onClick={() => handleImageClick(row)}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{row.nama_menu}</h6>
+                                </div>
+                                <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div>
+                              </div>
+                            </>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <h4 className="card-title">Custom</h4>
+                        <div className="row">
+                          <>
+                            <div className="col-sm-6 col-md-4 col-lg-3">
+                              <div className="row justify-content-center">
+                                <div className="row justify-content-center">
+                                  <div className="item fixed-size-image-container">
+                                    <Image
+                                      src={require("../../assets/images/custom-photo.png")}
+                                      alt={`custom`}
+                                      style={{
+                                        display: "block",
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                      }}
+                                      onClick={() => handleShowCustomModal()}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="row justify-content-center text-center m-3">
+                                <h6>Klik di sini untuk kustom menu</h6>
+                              </div>
+                              {/* <div className="row justify-content-center text-center m-3">
+                                  <h6>{formatPrice(row.harga)}</h6>
+                                </div> */}
+                            </div>
+                          </>
+                        </div>
+                      </div>
+                    </Slider>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1108,7 +1076,7 @@ export const PointOfSales = () => {
                             height: 400,
                             width: 300,
                             position: "relative",
-                            left:"auto",
+                            left: "auto",
                             overflow: "hidden",
                           }}
                         >
@@ -1381,6 +1349,14 @@ export const PointOfSales = () => {
         handleClose={handleCloseModalCustom}
         handleImageClick={handleImageClick}
       />
+      {visible && (
+        <button
+          className="mt-3 btn btn-warning btn-lg scroll-to-top"
+          onClick={scrollToTop}
+        >
+          ↑ Kembali ke Atas ↑
+        </button>
+      )}
     </>
   );
 };
