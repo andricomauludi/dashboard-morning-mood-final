@@ -18,7 +18,7 @@ export const Recap = () => {
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");
+  const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");  
   const [totalCurrentMonth, setTotalCurrentMonth] = useState(0);
   const [totalCurrentDay, setTotalCurrentDay] = useState(0);
   const [totalPengeluaranDay, setTotalPengeluaranDay] = useState(0);
@@ -164,6 +164,7 @@ export const Recap = () => {
     const apiUrl = BACKEND;
     const formData = new FormData();
     formData.append("jenis_pembayaran", jenisPembayaran);
+    formData.append("jenis_pengeluaran", jenisPembayaran);
 
     try {
       const response = await axios.post(
