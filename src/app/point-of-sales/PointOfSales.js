@@ -184,6 +184,7 @@ export const PointOfSales = () => {
   };
 
   const handleRowClick = async (billId) => {
+    //ini adalah row untuk list saved bill
     setCurrentBillId(billId);
     try {
       const response = await fetch(
@@ -246,9 +247,6 @@ export const PointOfSales = () => {
 
       console.log("Detail bill response:", detailBillResponse.data.data);
       setDataReceiptDetailBill(detailBillResponse.data.data);
-      // const detailBillResponse = await axios.post("http://127.0.0.1:8090/api/transaction/create_detail_bill_json", {
-      //  modifiedSelectedImages
-      // });
 
       // Clear selectedImages and selectedPayment after sending data
       setSelectedImages([]);
@@ -484,7 +482,7 @@ export const PointOfSales = () => {
     // Scroll to top button functionality
     // Scroll to top button functionality
     const handleScroll = () => {
-      if (window.scrollY > 100) {        
+      if (window.scrollY > 100) {
         setVisible(true);
       } else {
         setVisible(false);
@@ -505,10 +503,18 @@ export const PointOfSales = () => {
     printWindow.document.close();
     printWindow.print();
   };
+  const printReceiptUnpaid = () => {    
+    const printContent = generateReceiptContentUnpaid();
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   // <ReceiptHelperContent dataReceiptBill={dataReceiptBill}/>
 
   const generateReceiptContent = () => {
+    //resi udah dibayar
     const receiptContent = `
     <style>
         * {
@@ -640,6 +646,135 @@ export const PointOfSales = () => {
         </p>
     </div>   
     <script src="script.js"></script>
+    `;
+    return receiptContent;
+  };
+  const generateReceiptContentUnpaid = () => {
+    const receiptContent = `
+    <style>
+        * {
+            font-size: 12px;
+            font-family: 'Times New Roman';
+            width: 155px;
+
+        }
+
+        td,
+        th,
+        tr,
+        table {
+            /* border-top: 1px solid black; */
+            border-collapse: collapse;
+        }
+
+
+        td.description,
+        th.description {
+            width: 90px;
+            max-width: 90px;
+        }
+
+        td.quantity,
+        th.quantity {
+            width: 15px;
+            max-width: 15px;
+            word-break: break-all;
+        }
+
+        td.price,
+        th.price {
+            width: 50px;
+            max-width: 50px;
+            word-break: break-all;
+        }
+
+        .centered {
+            text-align: center;
+            align-content: center;
+        }
+
+        .ticket {
+            width: 155px;
+            max-width: 155px;
+        }
+
+        img {
+            max-width: inherit;
+            width: inherit;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid black;
+            margin: 10px 0;
+        }
+        .text-right {
+            text-align: right;
+            margin-left: auto;
+            margin-right : 10px;
+        }
+
+        @media print {
+            @page {
+            width: 155px;
+                margin: 0;
+            }
+            .hidden-print,
+            .hidden-print * {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <div class="ticket">
+        <img src=${logo} alt="Logo">
+        <p class="centered" style="font-weight: bold;">Kedai Ceu Monny
+            <br>Villa Bogor Indah 6, Blok B6 No.10. Sukaraja, Kabupaten Bogor
+            <br>+62 821-1249-2060
+        </p>
+  
+        <hr />
+        <table style="width: 100%;">
+            <!-- <thead>
+                <tr>
+                    <th class="quantity">Jml.</th>
+                    <th class="description">Menu</th>
+                    <th class="price">Rp.</th>
+                </tr>
+            </thead> -->
+            <tbody>
+             ${
+               selectedImages
+                 ? selectedImages
+                     .map(
+                       (item) => `
+                  <tr style="width: 10%;">
+                    <td class="quantity">${item.jumlah}</td>
+                    <td class="description">${item.nama_menu}</td>
+                    <td class="price">${item.total_harga}</td>
+                </tr>                   
+                  `
+                     )
+                     .join("")
+                 : "<p>Loading detail items...</p>"
+             }
+            </tbody>
+        </table>
+        <hr />
+
+         <p class="text-right" style="font-weight:bold;">Total : ${formatPrice(
+           getTotalPrice()
+         )}
+        </p>
+        <p class="text-right" style="font-weight:bold; color:red;">
+            <br>Belum melakukan pembayaran
+        </p>
+        <p class="centered">Waktu Cetak :
+            <br>${formatDate(Date.now())}
+            <br>Terimakasih
+        </p>
+    </div>   
+    <script src="script.js"></script>F
     `;
     return receiptContent;
   };
@@ -779,7 +914,14 @@ export const PointOfSales = () => {
                     </div>
                   </div>
                   <button
-                    className="mt-3 btn btn-info btn-lg btn-block"
+                    className="mt-3 btn btn-success btn-lg btn-block"
+                    onClick={printReceiptUnpaid}
+                    disabled={selectedImages.length === 0}
+                  >
+                    Print Pesanan
+                  </button>
+                  <button
+                    className="mt-5 btn btn-info btn-lg btn-block"
                     onClick={handleShow}
                     disabled={selectedImages.length === 0}
                   >
