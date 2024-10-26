@@ -766,15 +766,18 @@ export const PointOfSales = () => {
            getTotalPrice()
          )}
         </p>
-        <p class="text-right" style="font-weight:bold; color:red;">
-            <br>Belum melakukan pembayaran
+        <br>        
+        <p class="centered">*************************<p>
+        <p class="centered" style="font-weight:bold;">
+        Belum melakukan pembayaran
         </p>
+        <p class="centered">*************************<p>        
         <p class="centered">Waktu Cetak :
             <br>${formatDate(Date.now())}
             <br>Terimakasih
         </p>
     </div>   
-    <script src="script.js"></script>F
+    <script src="script.js"></script>
     `;
     return receiptContent;
   };
