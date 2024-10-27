@@ -18,7 +18,7 @@ export const Recap = () => {
   const [show, setShow] = useState(false);
   const [rowid, setRowid] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");  
+  const [jenisPembayaran, setJenisPembayaran] = useState("Semua Jenis");
   const [totalCurrentMonth, setTotalCurrentMonth] = useState(0);
   const [totalCurrentDay, setTotalCurrentDay] = useState(0);
   const [totalPengeluaranDay, setTotalPengeluaranDay] = useState(0);
@@ -178,7 +178,6 @@ export const Recap = () => {
       );
       setTotalCurrentMonth(response.data.total_current_month);
 
-
       const responseCurrentToday = await axios.post(
         `${apiUrl}/api/pendapatan/show_pendapatan_harian_pembayaran`,
         formData,
@@ -199,7 +198,9 @@ export const Recap = () => {
           },
         }
       );
-      setTotalPengeluaranDay(responsePengeluaranToday.data.total_pengeluaran_today);
+      setTotalPengeluaranDay(
+        responsePengeluaranToday.data.total_pengeluaran_today
+      );
 
       const responsePengeluaranMonth = await axios.post(
         `${apiUrl}/api/pendapatan/show_pengeluaran_bulanan_jenis`,
@@ -210,7 +211,9 @@ export const Recap = () => {
           },
         }
       );
-      setTotalPengeluaranMonth(responsePengeluaranMonth.data.total_pengeluaran_current_month);
+      setTotalPengeluaranMonth(
+        responsePengeluaranMonth.data.total_pengeluaran_current_month
+      );
 
       const responseKeuntunganDay = await axios.post(
         `${apiUrl}/api/pendapatan/show_keuntungan_harian_jenis`,
@@ -221,7 +224,9 @@ export const Recap = () => {
           },
         }
       );
-      setTotalKeuntunganDay(responseKeuntunganDay.data.total_keuntungan_bersih_current_day);
+      setTotalKeuntunganDay(
+        responseKeuntunganDay.data.total_keuntungan_bersih_current_day
+      );
       const responseKeuntunganMonth = await axios.post(
         `${apiUrl}/api/pendapatan/show_keuntungan_bulanan_jenis`,
         formData,
@@ -231,8 +236,9 @@ export const Recap = () => {
           },
         }
       );
-      setTotalKeuntunganMonth(responseKeuntunganMonth.data.total_keuntungan_bersih_current_month);
-
+      setTotalKeuntunganMonth(
+        responseKeuntunganMonth.data.total_keuntungan_bersih_current_month
+      );
 
       // Optionally, refresh the dataSavedBill list or remove the deleted item from the state
     } catch (error) {
@@ -330,8 +336,7 @@ export const Recap = () => {
                 <Dropdown.Item eventKey="OVO">OVO</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            <div className="mt-3">           
-            </div>
+            <div className="mt-3"></div>
           </div>
         </div>
         <div className="row">
@@ -383,9 +388,7 @@ export const Recap = () => {
                 <div className="row">
                   <div className="col-9">
                     <div className="d-flex align-items-center align-self-start">
-                      <h3 className="mb-0">
-                        {formatIDR(totalPengeluaranDay)}
-                      </h3>
+                      <h3 className="mb-0">{formatIDR(totalPengeluaranDay)}</h3>
                       {/* <p className="text-success ml-2 mb-0 font-weight-medium">
                         +11%
                       </p> */}
@@ -564,7 +567,10 @@ export const Recap = () => {
                         </span>
                         Create Pemasukan
                       </button> */}
-                    <ExcelExportForm />
+                    <ExcelExportForm
+                      jenisLayanan={0}
+                      jenisRekap={"pemasukan"}
+                    />
                     {/* </a> */}
                   </div>
                 </Row>
@@ -589,15 +595,27 @@ export const Recap = () => {
                     </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => showModalPengeluaran()}
-                    >
-                      <span>
-                        <i className="mdi mdi-plus"></i>
-                      </span>
-                      Create Pengeluaran
-                    </button>
+                    <div className="row mb-3">
+                      <div className="col-lg-12 mr-auto text-sm-right">
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => showModalPengeluaran()}
+                        >
+                          <span>
+                            <i className="mdi mdi-plus"></i>
+                          </span>
+                          Create Pengeluaran
+                        </button>
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-lg-12 mr-auto text-sm-right">
+                        <ExcelExportForm
+                          jenisLayanan={0}
+                          jenisRekap={"pengeluaran"}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Row>
                 <div className="table-responsive">

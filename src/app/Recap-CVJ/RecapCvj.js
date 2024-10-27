@@ -10,6 +10,7 @@ import DatatablePengeluaran from "./DataTablePengeluaran.js";
 import { COLUMNSPEMASUKAN } from "./ColumnsPemasukan.js";
 import { COLUMNSPENGELUARAN } from "./ColumnsPengeluaran.js";
 import ModalCreatePengeluaran from "./ModalCreatePengeluaran.js";
+import ExcelExportForm from "../Recap/ExcelExportForm.js";
 
 export const RecapCvj = () => {
   const apiUrl = BACKEND;
@@ -308,7 +309,7 @@ export const RecapCvj = () => {
                     </div>
                   </div>
                 </div>
-                <h6 className="font-weight-normal text-dark" >
+                <h6 className="font-weight-normal text-dark">
                   Pendapatan Bersih Hari ini
                 </h6>
               </div>
@@ -431,16 +432,20 @@ export const RecapCvj = () => {
                     </h4>
                     {/* </label> */}
                   </div>
-                  {/* <div className="col-lg-6 mr-auto text-sm-right ">
-                    <a href="/inventory/create" className="align-items-right">
+                  <div className="col-lg-6 mr-auto text-sm-right ">
+                    {/* <a href="/inventory/create" className="align-items-right">
                       <button className="btn btn-outline-warning">
                         <span>
                           <i className="mdi mdi-plus"></i>
                         </span>
                         Create Pemasukan
                       </button>
-                    </a>
-                  </div> */}
+                    </a> */}
+                    <ExcelExportForm
+                      jenisLayanan={1}
+                      jenisRekap={"pemasukan"}
+                    />
+                  </div>
                 </Row>
                 <div className="table-responsive">
                   <DataTable
@@ -463,15 +468,27 @@ export const RecapCvj = () => {
                     </h4>
                   </div>
                   <div className="col-lg-6 mr-auto text-sm-right ">
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => showModalPengeluaran()}
-                    >
-                      <span>
-                        <i className="mdi mdi-plus"></i>
-                      </span>
-                      Create Pengeluaran
-                    </button>
+                    <div className="row mb-3">
+                      <div className="col-lg-12 mr-auto text-sm-right">
+                        <button
+                          className="btn btn-warning"
+                          onClick={() => showModalPengeluaran()}
+                        >
+                          <span>
+                            <i className="mdi mdi-plus"></i>
+                          </span>
+                          Create Pengeluaran
+                        </button>
+                      </div>
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-lg-12 mr-auto text-sm-right">
+                        <ExcelExportForm
+                          jenisLayanan={1}
+                          jenisRekap={"pengeluaran"}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Row>
                 <div className="table-responsive">

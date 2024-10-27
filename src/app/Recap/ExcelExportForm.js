@@ -3,7 +3,7 @@ import axios from "axios";
 import { Button, Form, Modal } from "react-bootstrap";
 import { BACKEND } from "../../constants";
 
-const ExcelExportForm = () => {
+const ExcelExportForm = ({ jenisLayanan, jenisRekap }) => {
   const apiUrl = BACKEND;
 
   const [showModal, setShowModal] = useState(false);
@@ -22,22 +22,42 @@ const ExcelExportForm = () => {
     event.preventDefault();
 
     const formData = new FormData();
+    console.log(jenisLayanan);
+    formData.append("jenis_layanan", jenisLayanan); //kalau 0 ceu monny, kalau 1 cvj
     formData.append("day", day);
     formData.append("month", month);
     formData.append("year", year);
 
-    try {
-      const response = await axios.post(
-        `${apiUrl}/api/transaction/excel_export`,
-        formData,
-        { responseType: "blob" }
-      );
+    if (jenisRekap == "pemasukan") {
+      try {
+        const response = await axios.post(
+          `${apiUrl}/api/transaction/excel_export`,
+          formData,
+          { responseType: "blob" }
+        );
 
-      // Create a URL for the file
-      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      setDownloadUrl(fileURL);
-    } catch (error) {
-      console.error("Error exporting Excel file:", error);
+        // Create a URL for the file
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        setDownloadUrl(fileURL);
+      } catch (error) {
+        console.error("Error exporting Excel file:", error);
+      }
+    } else {
+      console.log("masuk ke pengeluaran");
+
+      try {
+        const response = await axios.post(
+          `${apiUrl}/api/transaction/excel_export_pengeluaran`,
+          formData,
+          { responseType: "blob" }
+        );
+
+        // Create a URL for the file
+        const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+        setDownloadUrl(fileURL);
+      } catch (error) {
+        console.error("Error exporting Excel file:", error);
+      }
     }
   };
 
@@ -107,10 +127,23 @@ const ExcelExportForm = () => {
           </Form>
           {downloadUrl && (
             <div className="mt-3">
-              <a href={downloadUrl} download="rekap-ceu-monny.xlsx">
-              <Button variant="primary" type="button">
-              Klik di sini untuk download excel
-            </Button>
+              <a
+                href={downloadUrl}
+                download={
+                  jenisLayanan === 0 && jenisRekap === "pemasukan"
+                    ? "rekap-pemasukan-ceu-monny.xlsx"
+                    : jenisLayanan === 0 && jenisRekap === "pengeluaran"
+                    ? "rekap-pengeluaran-ceu-monny.xlsx"
+                    : jenisLayanan === 1 && jenisRekap === "pemasukan"
+                    ? "rekap-pemasukan-cvj.xlsx"
+                    : jenisLayanan === 1 && jenisRekap === "pengeluaran"
+                    ? "rekap-pengeluaran-cvj.xlsx"
+                    : "rekap.xlsx"
+                }
+              >
+                <Button variant="primary" type="button">
+                  Klik di sini untuk download excel
+                </Button>
               </a>
             </div>
           )}
