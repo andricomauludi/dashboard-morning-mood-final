@@ -503,7 +503,7 @@ export const PointOfSales = () => {
     printWindow.document.close();
     printWindow.print();
   };
-  const printReceiptUnpaid = () => {    
+  const printReceiptUnpaid = () => {
     const printContent = generateReceiptContentUnpaid();
     const printWindow = window.open("", "_blank");
     printWindow.document.write(printContent);
@@ -986,7 +986,7 @@ export const PointOfSales = () => {
                                 <div className="row justify-content-center">
                                   <div className="item fixed-size-image-container">
                                     <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
                                       alt={`${row.nama_menu}`}
                                       className="fixed-size-image"
                                       onClick={() => handleImageClick(row)}
@@ -1016,7 +1016,7 @@ export const PointOfSales = () => {
                                 <div className="row justify-content-center">
                                   <div className="item fixed-size-image-container">
                                     <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
                                       alt={`${row.nama_menu}`}
                                       className="fixed-size-image"
                                       onClick={() => handleImageClick(row)}
@@ -1046,7 +1046,7 @@ export const PointOfSales = () => {
                                 <div className="row justify-content-center">
                                   <div className="item fixed-size-image-container">
                                     <Image
-                                      src={`data:image/jpeg;base64,${row.photo}`}
+                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
                                       alt={`${row.nama_menu}`}
                                       className="fixed-size-image"
                                       onClick={() => handleImageClick(row)}
