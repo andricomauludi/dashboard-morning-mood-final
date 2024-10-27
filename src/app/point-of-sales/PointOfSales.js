@@ -957,7 +957,7 @@ export const PointOfSales = () => {
                               <div className="row justify-content-center">
                                 <div className="item fixed-size-image-container">
                                   <Image
-                                    src={`data:image/jpeg;base64,${row.photo}`}
+                                    src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
                                     alt={`${row.nama_menu}`}
                                     className="fixed-size-image"
                                     onClick={() => handleImageClick(row)}
