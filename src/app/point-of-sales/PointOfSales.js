@@ -8,6 +8,7 @@ import TimeSpent from "./timestamphelper";
 import logo from "../../assets/logo-ceu-monny.png";
 import { BACKEND } from "../../constants";
 import ModalCustomMenu from "./ModalCustomMenu";
+import LazyLoad from "react-lazyload";
 
 export const PointOfSales = () => {
   const sliderSettings = {
@@ -955,15 +956,18 @@ export const PointOfSales = () => {
                           {datas.map((row, index) => (
                             <div className="col-sm-6 col-md-4 col-lg-3">
                               <div className="row justify-content-center">
-                                <div className="item fixed-size-image-container">
-                                  <Image
-                                    src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
-                                    alt={`${row.nama_menu}`}
-                                    className="fixed-size-image"
-                                    onClick={() => handleImageClick(row)}
-                                    layout="fill"
-                                  />
-                                </div>
+                                <LazyLoad height={200} offset={100} once>
+                                  <div className="item fixed-size-image-container">
+                                    <Image
+                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
+                                      alt={`${row.nama_menu}`}
+                                      placeholder="blur"
+                                      className="fixed-size-image"
+                                      onClick={() => handleImageClick(row)}
+                                      layout="fill"
+                                    />
+                                  </div>
+                                </LazyLoad>
                               </div>
                               <div className="row justify-content-center text-center m-3">
                                 <h6>{row.nama_menu}</h6>
@@ -984,15 +988,18 @@ export const PointOfSales = () => {
                             <>
                               <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
-                                  <div className="item fixed-size-image-container">
-                                    <Image
-                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
-                                      alt={`${row.nama_menu}`}
-                                      className="fixed-size-image"
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
+                                  <LazyLoad height={200} offset={100} once>
+                                    <div className="item fixed-size-image-container">
+                                      <Image
+                                        src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
+                                        alt={`${row.nama_menu}`}
+                                        placeholder="blur"
+                                        className="fixed-size-image"
+                                        onClick={() => handleImageClick(row)}
+                                        layout="fill"
+                                      />
+                                    </div>
+                                  </LazyLoad>
                                 </div>
                                 <div className="row justify-content-center text-center m-3">
                                   <h6>{row.nama_menu}</h6>
@@ -1014,15 +1021,18 @@ export const PointOfSales = () => {
                             <>
                               <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
-                                  <div className="item fixed-size-image-container">
-                                    <Image
-                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
-                                      alt={`${row.nama_menu}`}
-                                      className="fixed-size-image"
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
+                                  <LazyLoad height={200} offset={100} once>
+                                    <div className="item fixed-size-image-container">
+                                      <Image
+                                        src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
+                                        alt={`${row.nama_menu}`}
+                                        placeholder="blur"
+                                        className="fixed-size-image"
+                                        onClick={() => handleImageClick(row)}
+                                        layout="fill"
+                                      />
+                                    </div>
+                                  </LazyLoad>
                                 </div>
                                 <div className="row justify-content-center text-center m-3">
                                   <h6>{row.nama_menu}</h6>
@@ -1044,15 +1054,18 @@ export const PointOfSales = () => {
                             <>
                               <div className="col-sm-6 col-md-4 col-lg-3">
                                 <div className="row justify-content-center">
-                                  <div className="item fixed-size-image-container">
-                                    <Image
-                                      src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
-                                      alt={`${row.nama_menu}`}
-                                      className="fixed-size-image"
-                                      onClick={() => handleImageClick(row)}
-                                      layout="fill"
-                                    />
-                                  </div>
+                                  <LazyLoad height={200} offset={100} once>
+                                    <div className="item fixed-size-image-container">
+                                      <Image
+                                        src={`/assets/products/${row.photo}`} // Menggunakan foto dari row
+                                        alt={`${row.nama_menu}`}
+                                        placeholder="blur"
+                                        className="fixed-size-image"
+                                        onClick={() => handleImageClick(row)}
+                                        layout="fill"
+                                      />
+                                    </div>
+                                  </LazyLoad>
                                 </div>
                                 <div className="row justify-content-center text-center m-3">
                                   <h6>{row.nama_menu}</h6>
@@ -1072,20 +1085,23 @@ export const PointOfSales = () => {
                             <div className="col-sm-6 col-md-4 col-lg-3">
                               <div className="row justify-content-center">
                                 <div className="row justify-content-center">
-                                  <div className="item fixed-size-image-container">
-                                    <Image
-                                      src={require("../../assets/images/custom-photo.png")}
-                                      alt={`custom`}
-                                      style={{
-                                        display: "block",
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                      }}
-                                      onClick={() => handleShowCustomModal()}
-                                      layout="fill"
-                                    />
-                                  </div>
+                                  <LazyLoad height={200} offset={100} once>
+                                    <div className="item fixed-size-image-container">
+                                      <Image
+                                        src={require("../../assets/images/custom-photo.png")}
+                                        alt={`custom`}
+                                        style={{
+                                          display: "block",
+                                          width: "100%",
+                                          height: "100%",
+                                          objectFit: "cover",
+                                        }}
+                                        onClick={() => handleShowCustomModal()}
+                                        placeholder="blur"
+                                        layout="fill"
+                                      />
+                                    </div>
+                                  </LazyLoad>
                                 </div>
                               </div>
                               <div className="row justify-content-center text-center m-3">
