@@ -50,4 +50,7 @@ jobs:
             sudo docker stop pos-frontend-container || true
             sudo docker rm pos-frontend-container || true
             sudo docker run -d --name pos-frontend-container --network frontend-connect ${{ secrets.DOCKER_IMAGE }}
+            sudo docker stop pos-frontend-cabang2-container || true
+            sudo docker rm pos-frontend-cabang2-container || true
+            sudo docker run -d --name pos-frontend-cabang2-container --network frontend-connect ${{ secrets.DOCKER_IMAGE }}
           EOF

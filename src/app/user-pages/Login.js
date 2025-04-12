@@ -43,7 +43,7 @@ export class Login extends Component {
       if (response.status === 200) {
         const authToken = response.data.data.token;
         console.log("Token yang diterima:", authToken); // Log token
-        Cookies.set('Authorization', authToken, { expires: 1, path: '/' });
+        Cookies.set("Authorization", authToken, { expires: 1, path: "/" });
         this.setState({ isAuthenticated: true });
         this.props.onLoginSuccess();
       }
@@ -66,13 +66,18 @@ export class Login extends Component {
 
     return (
       <div>
-        <div className="d-flex align-items-center auth px-0"    style={{
-    background: 'linear-gradient(to bottom, rgba(128, 0, 128, 0.4) 0%, rgba(0, 0, 0, 1) 100%)', // Increased opacity for a lighter purple
-    height: '100vh', // Cover full height
-  }}>
+        <div
+          className="d-flex align-items-center auth px-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(128, 0, 128, 0.4) 0%, rgba(0, 0, 0, 1) 100%)", // Increased opacity for a lighter purple
+            height: "100vh", // Cover full height
+          }}
+        >
           <div className="row w-100 mx-0">
             <div className="col-lg-4 mx-auto">
               <div className="card text-center py-5 px-4 px-sm-5">
+                <h1>CABANG 2</h1>
                 <div className="brand-logo">
                   <img
                     src={require("../../assets/logo-ceu-monny.png")}
