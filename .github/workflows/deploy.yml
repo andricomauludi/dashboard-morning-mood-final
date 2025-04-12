@@ -47,14 +47,14 @@ jobs:
           # Deploy Docker container to VM
           ssh -o StrictHostKeyChecking=no -i private_key.pem $SSH_USERNAME@$SSH_HOST << 'EOF'
             sudo docker pull ${{ secrets.DOCKER_IMAGE }}
-              sudo docker stop pos-frontend-container || true
-              sudo docker rm pos-frontend-container || true
-              sudo docker run -d \
-                --name pos-frontend-container \
-                --network frontend-connect \
-                --env-file /home/${secrets.SSH_USERNAME}/env/frontend.env \
-                ${{ secrets.DOCKER_IMAGE }}
-             sudo docker stop pos-frontend-cabang2-container || true
+            sudo docker stop pos-frontend-container || true
+            sudo docker rm pos-frontend-container || true
+            sudo docker run -d \
+              --name pos-frontend-container \
+              --network frontend-connect \
+              --env-file /home/${secrets.SSH_USERNAME}/env/frontend.env \
+              ${{ secrets.DOCKER_IMAGE }}
+            sudo docker stop pos-frontend-cabang2-container || true
             sudo docker rm pos-frontend-cabang2-container || true
             sudo docker run -d \
               --name pos-frontend-cabang2-container \
