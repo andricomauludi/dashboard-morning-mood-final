@@ -52,13 +52,13 @@ jobs:
             sudo docker run -d \
               --name pos-frontend-container \
               --network frontend-connect \
-              --env-file /home/$SSH_USERNAME/env/frontend.env \
+              --env-file /home/andricomauludi/env/frontend.env \
               ${{ secrets.DOCKER_IMAGE }}
             sudo docker stop pos-frontend-cabang2-container || true
             sudo docker rm pos-frontend-cabang2-container || true
             sudo docker run -d \
               --name pos-frontend-cabang2-container \
               --network frontend-connect \
-              --env-file /home/$SSH_USERNAME/env/frontend-cabang2.env \
+              --env-file /home/andricomauludi/env/frontend-cabang2.env \
               ${{ secrets.DOCKER_IMAGE }}
           EOF
