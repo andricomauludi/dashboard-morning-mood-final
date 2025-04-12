@@ -77,7 +77,9 @@ export class Login extends Component {
           <div className="row w-100 mx-0">
             <div className="col-lg-4 mx-auto">
               <div className="card text-center py-5 px-4 px-sm-5">
-                {/* <h1>CABANG 2</h1> */}
+                {BACKEND.includes("backend-cabang2.ceumonny.com") && (
+                  <h1>CABANG 2</h1>
+                )}
                 <div className="brand-logo">
                   <img
                     src={require("../../assets/logo-ceu-monny.png")}
