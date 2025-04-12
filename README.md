@@ -1,3 +1,6 @@
+cara jalaninnya adalah 
+
+
 # Corona React - Free Admin Template
 
 Love dark mode? Here’s Corona React, now available as a free template. Don’t let the name scare you, Corona is a sleek and sexy admin dashboard from BootstrapDash that is super easy to customize and set up. The free version has enough features for you to kickstart your project. If you like what you see, then check out the full version of this React admin template too.
