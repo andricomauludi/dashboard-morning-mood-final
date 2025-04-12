@@ -49,5 +49,18 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_IMAGE }}
             sudo docker stop pos-frontend-container || true
             sudo docker rm pos-frontend-container || true
-            sudo docker run -d --name pos-frontend-container --network frontend-connect ${{ secrets.DOCKER_IMAGE }}
+            sudo docker run -d \
+              --name pos-frontend-container \
+              --network frontend-connect \
+              --env-file /home/andricomauludi/env/frontend.env \
+              -p 3001:3000 \
+              ${{ secrets.DOCKER_IMAGE }}
+            sudo docker stop pos-frontend-cabang2-container || true
+            sudo docker rm pos-frontend-cabang2-container || true
+            sudo docker run -d \
+              --name pos-frontend-cabang2-container \
+              --network frontend-connect \
+              --env-file /home/andricomauludi/env/frontend-cabang2.env \
+              -p 3002:3000 \
+              ${{ secrets.DOCKER_IMAGE }}
           EOF
